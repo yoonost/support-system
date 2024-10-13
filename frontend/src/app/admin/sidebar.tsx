@@ -1,8 +1,12 @@
 import { ReactNode } from 'react'
+import { Input } from '@/components/input'
 
 export function SidebarComponent (): ReactNode {
     return (
-        <div className='static flex flex-col left-auto top-auto h-full border-r border-palette-background-secondary overflow-y-hidden px-5 py-5 w-[20%]'>
+        <div className='flex flex-col h-full border-r border-palette-background-secondary overflow-y-hidden p-5 w-[30%]'>
+            <div className='mb-5'>
+                <Input inputClassName='rounded-full' size='small' placeholder='Search...'/>
+            </div>
             <div className='flex flex-col space-y-3 overflow-y-scroll h-full scroll-sidebar'>
                 {[...Array(100)].map((i: number): ReactNode => (
                     <div key={i} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
