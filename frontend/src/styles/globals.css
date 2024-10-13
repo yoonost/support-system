@@ -39,3 +39,17 @@ html {
 html, body {
     @apply font-sans text-palette-primary bg-palette-background-primary w-full h-full;
 }
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Обрезать до 2 строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.scroll-sidebar::-webkit-scrollbar {
+    @apply w-0 h-0;
+}
