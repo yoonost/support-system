@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    --palette-default-primary: #2563eb;
+    --palette-default-secondary: #1d4ed8;
+    --palette-default-tertiary: #1e40af;
+
+    --palette-success-primary: #16a34a;
+    --palette-success-secondary: #15803d;
+    --palette-success-tertiary: #166534;
+
+    --palette-warning-primary: #ca8a04;
+    --palette-warning-secondary: #a16207;
+    --palette-warning-tertiary: #854d0e;
+
+    --palette-danger-primary: #dc2626;
+    --palette-danger-secondary: #b91c1c;
+    --palette-danger-tertiary: #991b1b;
+
+    --palette-info-primary: #3b82f6;
+    --palette-info-secondary: #2563eb;
+    --palette-info-tertiary: #1d4ed8;
+}
+
+html {
+    --palette-background-primary: #14161A;
+    --palette-background-secondary: #1d1e25;
+    --palette-primary: #EBECF0;
+    --palette-secondary: #A4A8B2;
+    --palette-gray-1: #D3D6DB;
+    --palette-gray-2: #A4A8B2;
+    --palette-gray-3: #707480;
+    --palette-gray-4: #515561;
+    --palette-gray-5: #282933;
+}
+
+html, body {
+    @apply font-sans text-palette-primary bg-palette-background-primary w-full h-full;
+}
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Обрезать до 2 строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.scroll-sidebar::-webkit-scrollbar {
+    @apply w-0 h-0;
+}
