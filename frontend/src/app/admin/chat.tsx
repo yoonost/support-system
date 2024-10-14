@@ -24,8 +24,8 @@ export function ChatComponent (): ReactNode {
                 {[...Array(30)].map((i: number): ReactNode => {
                     const type: boolean = Math.random() < 0.5
                     return (
-                        <div className={cn("flex items-end", type && 'justify-end')} key={i}>
-                            <div className={cn("flex flex-col max-w-[50%]", type && 'items-end')}>
+                        <div className={cn('flex items-end', type && 'justify-end')} key={i}>
+                            <div className={cn('flex flex-col max-w-[50%]', type && 'items-end')}>
                                 <div className={cn('flex flex-row items-center gap-x-1 mb-1 flex-wrap', type && 'flex-row-reverse')}>
                                     <span className='text-palette-gray-1'>admin@gmail.com</span>
                                     <span className='text-palette-gray-3 text-xs'>0:37 14.10.2024</span>

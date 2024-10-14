@@ -5,7 +5,7 @@ import { ControlComponent } from '@/app/admin/control'
 
 export default function Page(): ReactNode {
     return (
-        <main className="flex overflow-hidden w-full h-full">
+        <main className='flex overflow-hidden w-full h-full'>
             <SidebarComponent />
             <ChatComponent />
             <ControlComponent />
