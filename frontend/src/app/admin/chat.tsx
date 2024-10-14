@@ -21,7 +21,7 @@ export function ChatComponent (): ReactNode {
                 <span className='text-xl text-palette-gray-2'>(# 5452)</span>
             </div>
             <div className='flex flex-col space-y-3 overflow-y-scroll scroll-sidebar p-5 h-full' ref={scrollRef}>
-                {[...Array(30)].map((i: number): ReactNode => {
+                {[...Array(30)].map((_, i: number): ReactNode => {
                     const type: boolean = Math.random() < 0.5
                     return (
                         <div className={cn('flex items-end', type && 'justify-end')} key={i}>
@@ -39,7 +39,7 @@ export function ChatComponent (): ReactNode {
                 })}
             </div>
             <div className='flex flex-row flex-1 space-x-3 p-5'>
-                <Input divClassname='w-full' inputClassName='rounded-full w-full' size='small' placeholder='Search...'/>
+                <Input divClassname='w-full' inputClassName='rounded-full w-full' size='small' placeholder='Enter a message...'/>
                 <Button className='rounded-full'>Send</Button>
             </div>
         </div>

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { Link } from '@/components/link'
+import NextLink from 'next/link'
 
 export default function Page(): ReactNode {
     return (
@@ -9,8 +10,8 @@ export default function Page(): ReactNode {
                 <Link href={'/new-ticket'} variant={'primary'}>New ticket</Link>
             </div>
             <div className='flex flex-col space-y-3'>
-                {[...Array(100)].map((i: number): ReactNode => (
-                    <div key={i} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
+                {[...Array(100)].map((_, i: number): ReactNode => (
+                    <NextLink key={i} href={`/chat/${i}`} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
                         <div className='flex flex-row justify-between items-center mb-1'>
                             <span className='font-semibold text-sm'>Subject</span>
                             <div className='flex flex-row space-x-1'>
@@ -18,7 +19,7 @@ export default function Page(): ReactNode {
                             </div>
                         </div>
                         <span className='h-8 truncate-text text-xs text-palette-gray-2'>Comrades! The beginning of daily work on the formation of the position allows us to evaluate the importance of the forms of development. On the other hand, the realization of the planned tasks allows us to evaluate the importance of the development model. On the other hand, the existing structure of the organization requires the definition and clarification of further directions of development.</span>
-                    </div>
+                    </NextLink>
                 ))}
             </div>
         </>

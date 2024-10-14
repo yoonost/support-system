@@ -8,7 +8,7 @@ export function SidebarComponent (): ReactNode {
                 <Input inputClassName='rounded-full' size='small' placeholder='Search...'/>
             </div>
             <div className='flex flex-col space-y-3 overflow-y-scroll h-full scroll-sidebar'>
-                {[...Array(100)].map((i: number): ReactNode => (
+                {[...Array(100)].map((_, i: number): ReactNode => (
                     <div key={i} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
                         <div className='flex flex-row justify-between items-center mb-1'>
                             <span className='font-semibold text-sm'>Subject</span>

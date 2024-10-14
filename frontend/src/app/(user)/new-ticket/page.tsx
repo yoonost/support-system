@@ -22,6 +22,7 @@ export default function Page(): ReactNode {
             </div>
             <form onSubmit={(e) => onClickSubmit(e)}>
                 <div className='flex flex-col space-y-3 mt-5'>
+                    <Input id='email' label='Email' value='admin@gmail.com' disabled />
                     <Input id='subject' label='Subject'/>
                     <Textarea id='description' label='Description' />
                 </div>
