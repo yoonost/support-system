@@ -1,8 +1,7 @@
-/.idea
-
-/frontend/.next
-/frontend/node_modules
-/frontend/package-lock.json
-
-/backend/node_modules
-/backend/package-lock.json
+.idea
+.next
+node_modules
+package-lock.json
+server/.idea
+server/node_modules
+server/package-lock.json
