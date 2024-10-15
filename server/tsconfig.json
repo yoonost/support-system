@@ -1,5 +1,4 @@
 {
-    "lib": ["ESLint"],
     "compilerOptions": {
         "target": "ES2018",
         "module": "commonjs",

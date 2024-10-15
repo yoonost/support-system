@@ -3,18 +3,19 @@ import { json as bodyParserJson, urlencoded as bodyParserUrlencoded } from 'body
 import { express as expressUserAgent } from 'express-useragent'
 import { errorMiddleware, notfoundMiddleware } from './middlewares/error.middleware'
 
-interface RouteProps {
+interface routeProps {
     path: string
     router: Router
 }
 
-class Application {
+export class application {
     public app: express.Application
     private port: number = parseInt(process.env.WORK_PORT || '3000', 10)
 
-    constructor(routes: RouteProps[]) {
+    constructor(routes: routeProps[]) {
         this.app = express()
 
+        this.app.disable('x-powered-by')
         this.initializeMiddlewares()
         this.initializeRoutes(routes)
         this.initializeErrorHandling()
@@ -26,8 +27,8 @@ class Application {
         this.app.use(expressUserAgent())
     }
 
-    private initializeRoutes(routes: RouteProps[]): void {
-        routes.forEach((route: RouteProps): void => {
+    private initializeRoutes(routes: routeProps[]): void {
+        routes.forEach((route: routeProps): void => {
             console.log(`✅ Registering route for ${route.path}`)
             this.app.use(route.path, route.router)
         })
@@ -44,5 +45,3 @@ class Application {
         })
     }
 }
-
-export default Application

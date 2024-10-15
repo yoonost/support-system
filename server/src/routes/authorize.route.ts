@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { signInDto, signUpDto } from '../dtos/authorize.dto'
-import validationMiddleware from '../middlewares/validation.middleware'
-import storageMiddleware from '../middlewares/storage.middleware'
-import authorizeController from '../controllers/authorize.controller'
+import { validationMiddleware } from '../middlewares/validation.middleware'
+import { storageMiddleware } from '../middlewares/storage.middleware'
+import { authorizeController } from '../controllers/authorize.controller'
 
-export default class authorizeRoute {
+export class authorizeRoute {
     private controller: authorizeController = new authorizeController()
 
     public path: string = '/authorize'

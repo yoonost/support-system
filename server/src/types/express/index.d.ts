@@ -1,4 +1,4 @@
-import { PoolConnection } from 'mysql2/promise'
+import { PoolConnection } from '../../storage'
 
 declare global {
     namespace Express {

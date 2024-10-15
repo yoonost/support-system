@@ -1,4 +1,4 @@
-export default function randomStringUtil (length: number): string {
+export function randomStringUtil (length: number): string {
     let result = '' as string
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     const charactersLength: number = characters.length

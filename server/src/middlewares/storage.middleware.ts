@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
-import pool from '../storage'
+import { storage as Storage } from '../storage'
 
-const storageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const storageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let storage
     try {
-        storage = await pool.getConnection()
+        storage = await Storage.getConnection()
 
         req.storage = storage
 
@@ -18,5 +18,3 @@ const storageMiddleware = async (req: Request, res: Response, next: NextFunction
         next(error)
     }
 }
-
-export default storageMiddleware

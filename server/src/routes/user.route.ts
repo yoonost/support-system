@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import storageMiddleware from '../middlewares/storage.middleware'
-import authorizeMiddleware from '../middlewares/authorize.middleware'
-import userController from '../controllers/user.controller'
+import { storageMiddleware } from '../middlewares/storage.middleware'
+import { authorizeMiddleware } from '../middlewares/authorize.middleware'
+import { userController } from '../controllers/user.controller'
 
-export default class authorizeRoute {
+export class userRoute {
     private controller: userController = new userController()
 
     public path: string = '/user'
