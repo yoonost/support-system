@@ -1,14 +1,17 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router } from 'express'
+import { signInDto, signUpDto } from '../dtos/authorize.dto'
+import validationMiddleware from '../middlewares/validation.middleware'
+import storageMiddleware from '../middlewares/storage.middleware'
+import authorizeController from '../controllers/authorize.controller'
 
-export default class AuthorizeRoute {
-    public path = '/authorize'
+export default class authorizeRoute {
+    private controller: authorizeController = new authorizeController()
+
+    public path: string = '/authorize'
     public router: Router = Router()
 
     constructor() {
-        this.router.post('/authorize/sign-in', this.getMe.bind(this))
-    }
-
-    private getMe = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-
+        this.router.post('/sign-in', validationMiddleware(signInDto), storageMiddleware, this.controller.signIn)
+        this.router.post('/sign-up', validationMiddleware(signUpDto), storageMiddleware, this.controller.signUp)
     }
 }

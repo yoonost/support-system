@@ -1,23 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
+import response from '../utils/response.util'
 
 const errorMiddleware = (err: Error, req: Request, res: Response, _: NextFunction): Response => {
-    return res.status(500).json({
-        status: false,
-        error: {
-            code: 500,
-            message: 'An internal server error occurred. Please try again later or contact support.'
-        }
-    })
+    console.error(`⛔ Server Error: ${err.message}`)
+    return response(500, 'An internal server error occurred. Please try again later or contact support', res)
 }
 
 const notfoundMiddleware = (req: Request, res: Response, _: NextFunction): Response => {
-    return res.status(404).json({
-        status: false,
-        error: {
-            code: 404,
-            message: 'The requested resource or endpoint could not be found. Please check the URL and try again.'
-        }
-    })
+    return response(404, 'The requested resource or endpoint could not be found. Please check the URL and try again', res)
 }
 
 export { errorMiddleware, notfoundMiddleware }

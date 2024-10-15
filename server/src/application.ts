@@ -3,7 +3,7 @@ import { json as bodyParserJson, urlencoded as bodyParserUrlencoded } from 'body
 import { express as expressUserAgent } from 'express-useragent'
 import { errorMiddleware, notfoundMiddleware } from './middlewares/error.middleware'
 
-interface Controller {
+interface RouteProps {
     path: string
     router: Router
 }
@@ -12,11 +12,11 @@ class Application {
     public app: express.Application
     private port: number = parseInt(process.env.WORK_PORT || '3000', 10)
 
-    constructor(controllers: Controller[]) {
+    constructor(routes: RouteProps[]) {
         this.app = express()
 
         this.initializeMiddlewares()
-        this.initializeControllers(controllers)
+        this.initializeRoutes(routes)
         this.initializeErrorHandling()
     }
 
@@ -26,10 +26,10 @@ class Application {
         this.app.use(expressUserAgent())
     }
 
-    private initializeControllers(controllers: Controller[]): void {
-        controllers.forEach((controller: Controller): void => {
-            console.log(`✅ Registering routes for ${controller.path}`)
-            this.app.use(controller.path, controller.router)
+    private initializeRoutes(routes: RouteProps[]): void {
+        routes.forEach((route: RouteProps): void => {
+            console.log(`✅ Registering route for ${route.path}`)
+            this.app.use(route.path, route.router)
         })
     }
 
@@ -40,7 +40,7 @@ class Application {
 
     public listen(): void {
         this.app.listen(this.port, (): void => {
-            console.log(`✅ App listening on the port ${this.port}`);
+            console.log(`✅ App listening on the port ${this.port}`)
         })
     }
 }
