@@ -1,43 +1,44 @@
-import { PoolConnection, RowDataPacket, FieldPacket, ResultSetHeader } from '../storage'
+import { Request } from 'express'
+import { RowDataPacket, FieldPacket, ResultSetHeader } from '../storage'
 import { randomStringUtil } from '../utils/randomString.util'
 import md5 from 'md5'
 
 export class authorizeService {
-    public async signIn(email: string, password: string, storage: PoolConnection): Promise<{ code: number; data: string | object }> {
+    public async signIn(email: string, password: string, req: Request): Promise<{ code: number; data: string | object }> {
         try {
             const [ user ]: [ RowDataPacket[], FieldPacket[] ] =
-                await storage.query('SELECT `id`, `email` FROM `users` WHERE `email` = ? AND `password` = ? LIMIT 1', [ email, md5(password) ])
+                await req.storage.query('SELECT `id`, `email` FROM `users` WHERE `email` = ? AND `password` = ? LIMIT 1', [ email, md5(password) ])
 
             if (user.length === 0)
                 return { code: 404, data: 'User not found or incorrect password' }
 
-            return { code: 200, data: { sessionToken: await this.createSession(user[0].id, storage) }}
+            return { code: 200, data: { sessionToken: await this.createSession(user[0].id, req) }}
         } catch (error) {
             throw error
         }
     }
-    public async signUp(email: string, password: string, storage: PoolConnection): Promise<{ code: number; data: string | object }> {
+    public async signUp(email: string, password: string, req: Request): Promise<{ code: number; data: string | object }> {
         try {
             const [ user ]: [ RowDataPacket[], FieldPacket[] ] =
-                await storage.query('SELECT `id` FROM `users` WHERE `email` = ? LIMIT 1', [ email ])
+                await req.storage.query('SELECT `id` FROM `users` WHERE `email` = ? LIMIT 1', [ email ])
 
             if (user.length !== 0)
                 return { code: 400, data: 'The email address is already registered. Please choose a different one' }
 
             const [ result ]: [ ResultSetHeader, FieldPacket[] ] =
-                await storage.query('INSERT INTO `users` (`email`, `password`) VALUES (?, ?)', [ email, md5(password) ])
-            const sessionToken: string = await this.createSession(result.insertId, storage)
+                await req.storage.query('INSERT INTO `users` (`email`, `password`) VALUES (?, ?)', [ email, md5(password) ])
+            const sessionToken: string = await this.createSession(result.insertId, req)
 
             return { code: 200, data: { sessionToken }}
         } catch (error) {
             throw error
         }
     }
-    private async createSession (userId: number, storage: PoolConnection) {
+    private async createSession (userId: number, req: Request) {
         const token: string = randomStringUtil(128)
         const expires: number = Math.floor(Date.now() / 1000) + 10800
 
-        await storage.query('INSERT INTO `sessions` (`userId`, `token`, `authorizationTime`, `expirationTime`) VALUES (?, ?, UNIX_TIMESTAMP(), ?)', [ userId, token, expires ])
+        await req.storage.query('INSERT INTO `sessions` (`userId`, `token`, `authorizationTime`, `expirationTime`) VALUES (?, ?, UNIX_TIMESTAMP(), ?)', [ userId, token, expires ])
 
         return token
     }
