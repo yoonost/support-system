@@ -1,9 +1,12 @@
 'use client'
 
 import { createContext, useState, useEffect, ReactNode } from 'react'
+import { Transition } from '@headlessui/react'
+import logotype from '@/images/favicon.png'
+import Image from 'next/image'
 import axios from 'axios'
 
-interface userDataInterface {
+interface UserDataInterface {
     loading: boolean
     authenticated: boolean
     user: {
@@ -13,30 +16,64 @@ interface userDataInterface {
     }
 }
 
-const ContextData = createContext({
+const ContextData = createContext<{
+    data: UserDataInterface
+    updateData: (key: string, value: string | number | boolean) => void
+}>({
     data: {
         loading: true,
         authenticated: false,
-        user: {}
-    }
+        user: {
+            id: undefined,
+            email: undefined,
+            role: undefined
+        }
+    },
+    updateData: () => {}
 })
 
-function ProviderContext ({ children }: { children: ReactNode }): ReactNode {
-    const [ userData, setData ] = useState<userDataInterface>({
+function ProviderContext ({ children }: { children: ReactNode }): JSX.Element {
+    const [data, setData] = useState<UserDataInterface>({
         loading: true,
         authenticated: false,
         user: {}
     })
 
-    const updateData = (key: string, value: string | number | boolean) =>
-        setData({ ...userData, [key]: value })
+    const updateData = (key: string, value: string | number | boolean) => {
+        setData((prevData) => ({
+            ...prevData,
+            [key]: value
+        }))
+    }
 
     useEffect(() => {
-        updateData('loading', false)
-    })
+        if (sessionStorage.getItem('session')) {
+            axios.get('http://localhost:8080/user/me', {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('session')}`
+                }
+            }).then((response) => {
+                if (response.status === 200) {
+                    updateData('user', response.data)
+                    updateData('authenticated', true)
+                    updateData('loading', false)
+                } else {
+                    sessionStorage.removeItem('session')
+                    updateData('loading', false)
+                }
+            }).catch(() => {
+                sessionStorage.removeItem('session')
+                updateData('loading', false)
+            })
+        } else {
+            updateData('loading', false)
+        }
+    }, [])
 
     return (
-        <ContextData.Provider value={{ userData, updateData }}>{!userData.loading ? children : 'loading'}</ContextData.Provider>
+        <>
+            <ContextData.Provider value={{ data, updateData }}>{!data.loading && children}</ContextData.Provider>
+        </>
     )
 }
 

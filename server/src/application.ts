@@ -2,6 +2,7 @@ import express, { Router } from 'express'
 import { json as bodyParserJson, urlencoded as bodyParserUrlencoded } from 'body-parser'
 import { express as expressUserAgent } from 'express-useragent'
 import { errorMiddleware, notfoundMiddleware } from './middlewares/error.middleware'
+import cors from 'cors'
 
 interface routeProps {
     path: string
@@ -16,6 +17,12 @@ export class application {
         this.app = express()
 
         this.app.disable('x-powered-by')
+        this.app.use(cors({
+            origin: '*',
+            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+            allowedHeaders: ['Content-Type', 'Authorization']
+        }))
+
         this.initializeMiddlewares()
         this.initializeRoutes(routes)
         this.initializeErrorHandling()
