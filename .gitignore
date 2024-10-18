@@ -3,5 +3,6 @@
 node_modules
 package-lock.json
 server/.idea
+server/dist
 server/node_modules
 server/package-lock.json

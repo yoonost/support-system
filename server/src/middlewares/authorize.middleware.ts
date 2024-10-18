@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { FieldPacket, RowDataPacket } from '../storage'
 import { responseUtil } from '../utils/response.util'
+import { userProps } from '../types/express'
 
 export const authorizeMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -17,7 +18,7 @@ export const authorizeMiddleware = async (req: Request, res: Response, next: Nex
 
         await req.storage.query('UPDATE `sessions` SET `activityTime` = UNIX_TIMESTAMP() WHERE `token` = ?', [ token ])
 
-        req.user = user[0]
+        req.user = user[0] as userProps
 
         next()
     } catch (error) {
