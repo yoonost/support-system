@@ -6,20 +6,10 @@ export class supportController {
     private service: supportService = new supportService()
 
     constructor() {
-        this.messages = this.messages.bind(this)
         this.tickets = this.tickets.bind(this)
-        this.newTicket = this.newTicket.bind(this)
-        this.addMessage = this.addMessage.bind(this)
-    }
-
-    public async messages (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
-        try {
-            const { ticketId } = req.body
-            const { code, data } = await this.service.messages(ticketId, req)
-            return responseUtil(code, data, res)
-        } catch (error) {
-            next(error)
-        }
+        this.new = this.new.bind(this)
+        this.ticket = this.ticket.bind(this)
+        this.send = this.send.bind(this)
     }
 
     public async tickets (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
@@ -30,21 +20,25 @@ export class supportController {
             next(error)
         }
     }
-
-    public async newTicket (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    public async new (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { subject, message } = req.body
-            const { code, data } = await this.service.newTicket(subject, message, req)
+            const { code, data } = await this.service.new(req.body.subject, req.body.message, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
         }
     }
-
-    public async addMessage (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    public async ticket (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { ticketId, message } = req.body
-            const { code, data } = await this.service.addMessage(ticketId, message, req)
+            const { code, data } = await this.service.ticket(parseInt(req.params.id), req)
+            return responseUtil(code, data, res)
+        } catch (error) {
+            next(error)
+        }
+    }
+    public async send (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { code, data } = await this.service.send(parseInt(req.params.id), req.body.message, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)

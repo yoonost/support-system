@@ -1,8 +1,26 @@
-import { ReactNode } from 'react'
+'use client'
+
+import { useEffect, useState, ReactNode } from 'react'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Link } from '@/components/link'
+import { Status } from '@/components/status'
 import NextLink from 'next/link'
 
 export default function Page(): ReactNode {
+    const [ tickets, setTickets ] = useState([])
+
+    useEffect(() => {
+        axios.get(`http://localhost:8080/ticket/tickets`, {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('session')}`
+            }
+        }).then((data: AxiosResponse) => {
+            if (data.data.status) setTickets(data.data.data)
+        }).catch((error: AxiosError) => {
+            console.log(error)
+        })
+    }, [])
+
     return (
         <>
             <div className='flex flex-row items-center justify-between mb-8'>
@@ -10,15 +28,15 @@ export default function Page(): ReactNode {
                 <Link href={'/new-ticket'} variant={'primary'}>New ticket</Link>
             </div>
             <div className='flex flex-col space-y-3'>
-                {[...Array(100)].map((_, i: number): ReactNode => (
-                    <NextLink key={i} href={`/chat/${i}`} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
+                {tickets.map((data, i: number): ReactNode => (
+                    <NextLink key={i} href={`/chat/${data.ticket_id}`} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
                         <div className='flex flex-row justify-between items-center mb-1'>
-                            <span className='font-semibold text-sm'>Subject</span>
+                            <span className='font-semibold text-sm'>{data.subject}</span>
                             <div className='flex flex-row space-x-1'>
-                                <div className='rounded-full text-xs bg-palette-success-primary px-1.5'>Open</div>
+                                <Status status={data.status} />
                             </div>
                         </div>
-                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>Comrades! The beginning of daily work on the formation of the position allows us to evaluate the importance of the forms of development. On the other hand, the realization of the planned tasks allows us to evaluate the importance of the development model. On the other hand, the existing structure of the organization requires the definition and clarification of further directions of development.</span>
+                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>{data.last_message}</span>
                     </NextLink>
                 ))}
             </div>

@@ -32,7 +32,7 @@ export default function Page(): ReactNode {
         setIsLoading (true)
 
         try {
-            const { data } = await axios.post(`http://localhost:8080/support/new-ticket`, { subject, message }, {
+            const { data } = await axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('session')}`
                 }

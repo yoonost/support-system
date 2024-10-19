@@ -1,10 +1,27 @@
-import { ReactNode } from 'react'
+'use client'
+
+import { useEffect, ReactNode, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { Link } from '@/components/link'
-import {cn} from "@/libs/utils";
-import {Button} from "@/components/button";
-import {Textarea} from "@/components/textarea";
+import { cn } from '@/libs/utils'
+import { Button } from '@/components/button'
+import { Textarea } from '@/components/textarea'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 
 export default function Page(): ReactNode {
+    const { id } = useParams()
+
+    const [ ticket, setTicket ] = useState([])
+    const [ messages, setMessages ] = useState([])
+
+    useEffect(() => {
+        axios.get(`http://localhost:8080/ticket/${id}`, {
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
+        }).then((data: AxiosResponse) => {
+
+        })
+    }, [])
+
     return (
         <>
             <div className='flex flex-row items-center justify-between mb-8'>
