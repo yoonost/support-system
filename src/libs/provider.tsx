@@ -54,7 +54,7 @@ function ProviderContext ({ children }: { children: ReactNode }): JSX.Element {
                 }
             }).then((response) => {
                 if (response.status === 200) {
-                    updateData('user', response.data)
+                    updateData('user', response.data.data)
                     updateData('authenticated', true)
                     updateData('loading', false)
                 } else {

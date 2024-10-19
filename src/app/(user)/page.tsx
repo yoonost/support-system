@@ -16,8 +16,6 @@ export default function Page(): ReactNode {
             }
         }).then((data: AxiosResponse) => {
             if (data.data.status) setTickets(data.data.data)
-        }).catch((error: AxiosError) => {
-            console.log(error)
         })
     }, [])
 
