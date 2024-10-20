@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, ReactNode } from 'react'
-import axios, { AxiosError, AxiosResponse } from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { Link } from '@/components/link'
 import { Status } from '@/components/status'
 import NextLink from 'next/link'
@@ -11,9 +11,7 @@ export default function Page(): ReactNode {
 
     useEffect(() => {
         axios.get(`http://localhost:8080/ticket/tickets`, {
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('session')}`
-            }
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
         }).then((data: AxiosResponse) => {
             if (data.data.status) setTickets(data.data.data)
         })
@@ -34,7 +32,7 @@ export default function Page(): ReactNode {
                                 <Status status={data.status} />
                             </div>
                         </div>
-                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>{data.last_message}</span>
+                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>{data.message}</span>
                     </NextLink>
                 ))}
             </div>

@@ -2,6 +2,7 @@ import { PoolConnection } from '../../storage'
 
 export interface userProps {
     id: number
+    username: string
     email: string
     role: string
 }

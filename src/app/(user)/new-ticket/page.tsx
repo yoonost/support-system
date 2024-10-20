@@ -5,8 +5,8 @@ import { Link } from '@/components/link'
 import { Input } from '@/components/input'
 import { Textarea } from '@/components/textarea'
 import { Button } from '@/components/button'
-import {isEmpty, isLength} from "validator";
-import axios from "axios";
+import { isEmpty, isLength } from 'validator'
+import axios from 'axios'
 
 export default function Page(): ReactNode {
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
@@ -19,23 +19,17 @@ export default function Page(): ReactNode {
         const subject: string = (form.elements.namedItem('subject') as HTMLInputElement).value
         const message: string = (form.elements.namedItem('message') as HTMLInputElement).value
 
-        if (isEmpty(subject))
-            return setInputError ({ input: 'subject', message: 'Subject must be a string' })
-        if (!isLength(subject, { min: 5, max: 64 }))
-            return setInputError({ input: 'subject', message: 'Subject must be between 5 and 100 characters long' })
+        if (isEmpty(subject)) return setInputError ({ input: 'subject', message: 'Subject must be a string' })
+        if (!isLength(subject, { min: 5, max: 100 })) return setInputError({ input: 'subject', message: 'Subject must be between 5 and 100 characters long' })
 
-        if (isEmpty(message))
-            return setInputError ({ input: 'message', message: 'Message must be a string' })
-        if (!isLength(message, { min: 1, max: 500 }))
-            return setInputError({ input: 'message', message: 'Message must be between 1 and 500 characters long' })
+        if (isEmpty(message))  return setInputError ({ input: 'message', message: 'Message must be a string' })
+        if (!isLength(message, { min: 1, max: 500 })) return setInputError({ input: 'message', message: 'Message must be between 1 and 500 characters long' })
 
         setIsLoading (true)
 
         try {
             const { data } = await axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('session')}`
-                }
+                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
             })
             if (data.error?.message) {
                 setInputError({ input: 'subject', message: data.error.message })

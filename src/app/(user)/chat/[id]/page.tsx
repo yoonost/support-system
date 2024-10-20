@@ -10,7 +10,7 @@ import axios, { AxiosResponse } from 'axios'
 import moment from 'moment'
 
 export default function Page(): ReactNode {
-    const [ ticket, setTicket ] = useState<any>(null)
+    const [ ticket, setTicket ] = useState(null)
     const { id } = useParams()
 
     useEffect(() => {
@@ -18,9 +18,7 @@ export default function Page(): ReactNode {
             headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
         }).then((data: AxiosResponse) => {
             setTicket(data.data.data)
-        }).catch(() => {
-            window.location.href = '/'
-        })
+        }).catch(() => window.location.href = '/')
     }, [])
 
     return ticket && (

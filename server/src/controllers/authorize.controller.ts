@@ -12,8 +12,8 @@ export class authorizeController {
 
     public async signIn (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { email, password } = req.body
-            const { code, data } = await this.service.signIn(email, password, req)
+            const { identifier, password } = req.body
+            const { code, data } = await this.service.signIn(identifier, password, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
@@ -22,8 +22,8 @@ export class authorizeController {
 
     public async signUp (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { email, password } = req.body
-            const { code, data } = await this.service.signUp(email, password, req)
+            const { username, email, password } = req.body
+            const { code, data } = await this.service.signUp(username, email, password, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
