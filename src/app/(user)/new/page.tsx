@@ -7,8 +7,9 @@ import { Textarea } from '@/components/textarea'
 import { Button } from '@/components/button'
 import { isEmpty, isLength } from 'validator'
 import { Alert } from '@/components/alert'
-import axios from 'axios'
+import axios, {AxiosError, AxiosResponse} from 'axios'
 import cookie from 'js-cookie'
+import {errorResponse} from "@/app/interfaces";
 
 export default function Page(): ReactNode {
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
@@ -30,21 +31,18 @@ export default function Page(): ReactNode {
 
         setIsLoading (true)
 
-        try {
-            const { data } = await axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
-                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-            })
-            if (data.error?.message) {
-                setInputError({ input: 'subject', message: data.error.message })
-            } else window.location.href = `/chat/${data.data.ticketId}`
-        } catch (error) {
+        axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
+            headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
+        }).then((data: AxiosResponse): string => window.location.href = `/ticket/${data.data.ticketId}`)
+        .catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setInputError({ input: 'subject', message: error.response.data.error.message })
                 else setDangerAlert('No response from server. Please check your connection')
             } else setDangerAlert('An unexpected error occurred')
-        }
+        })
 
         setIsLoading (false)
+        form.reset()
     }
 
     return (

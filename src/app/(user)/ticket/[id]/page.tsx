@@ -1,38 +1,16 @@
 'use client'
 
 import { useEffect, ReactNode, useState, FormEvent } from 'react'
+import {ticketProps, messageProps, errorResponse} from '@/app/interfaces'
 import { useParams } from 'next/navigation'
 import { Link } from '@/components/link'
 import { Button } from '@/components/button'
 import { Textarea } from '@/components/textarea'
-import axios, { AxiosResponse } from 'axios'
+import axios, {AxiosError, AxiosResponse} from 'axios'
 import { isLength, isEmpty } from 'validator'
 import { Alert } from '@/components/alert'
 import moment from 'moment'
 import cookie from 'js-cookie'
-
-interface ticketProps {
-    ticket_id: number
-    subject: string
-    status: number
-    created_at: number
-    updated_at: number
-    creator: string
-    creator_name: string | null
-    source: number
-    assigned_id: number
-    assigned_name: string | null
-    messages: messageProps[]
-}
-
-interface messageProps {
-    message: string
-    role: number
-    sender: string
-    sender_name: string | null
-    source: number
-    created_at: number
-}
 
 export default function Page(): ReactNode {
     const [ isLoadingSend, setIsLoadingSend ] = useState<boolean>(false)
@@ -64,20 +42,18 @@ export default function Page(): ReactNode {
         setIsLoadingSend(true)
         setInputError('')
 
-        try {
-            const { data } = await axios.post(`http://localhost:8080/ticket/${id}/send`, { message }, {
-                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-            })
-            if (!data.error?.message) {
-                updateTicket()
-                form.reset()
-            }
-        } catch (error) {
+        axios.post(`http://localhost:8080/ticket/${id}/send`, { message }, {
+            headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
+        }).then((): void => {
+            updateTicket()
+            form.reset()
+        })
+        .catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setInputError(error.response.data.error.message)
                 else setDangerAlert('No response from server. Please check your connection')
             } else setDangerAlert('An unexpected error occurred')
-        }
+        })
 
         setIsLoadingSend(false)
     }
@@ -87,7 +63,7 @@ export default function Page(): ReactNode {
 
         try {
             const { data } = await axios.put(`http://localhost:8080/ticket/${id}/close`, null, {
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
+                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
             })
             if (!data.error?.message) updateTicket()
         } catch (error) {
@@ -104,7 +80,7 @@ export default function Page(): ReactNode {
         updateTicket()
         const interval = setInterval(() => updateTicket(), 10000)
         return () => clearInterval(interval)
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     return ticket && (
         <>

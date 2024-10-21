@@ -99,7 +99,37 @@ export class supportService {
             throw error
         }
     }
-    public async assigned (ticketId: number, message: string, req: Request): Promise<{ code: number; data: string | object }> {
-        return { code: 200, data: '' }
+    public async assigned (ticketId: number, req: Request): Promise<{ code: number; data: string | object }> {
+        try {
+            const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
+
+            if (!isAdmin)
+                return { code: 403, data: 'You do not have access to execute this query' }
+
+            const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] =
+                await req.storage.query(`SELECT ticket_id, status, assigned_id FROM tickets WHERE ticket_id = ? LIMIT 1`, [ ticketId ])
+
+            if (ticket.length === 0)
+                return { code: 404, data: 'Ticket not found' }
+
+            if (ticket[0].status === 3)
+                return { code: 400, data: 'This ticket is closed' }
+
+            const messageId: string = randomStringUtil(32)
+            const isAssignedToUser: boolean = ticket[0].assigned_id === req.user?.id
+            const isUnassigned: boolean = ticket[0].assigned_id === null
+
+            if (isUnassigned || isAssignedToUser) {
+                const message = isUnassigned ? 'The administrator proceeded to execute the ticket' : 'The administrator has stopped working on the ticket. Wait for another administrator to be assigned';
+                await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 3, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, req.user?.id ])
+                await req.storage.query('UPDATE tickets SET assigned_id = ?, updated_at = UNIX_TIMESTAMP(), status = ? WHERE ticket_id = ? LIMIT 1', [ isUnassigned ? req.user?.id : null, isUnassigned ? 2 : 1, ticketId ])
+            } else {
+                return { code: 200, data: 'This ticket is assigned to another administrator' };
+            }
+
+            return { code: 200, data: { ticketId: ticket[0].ticket_id } }
+        } catch (error) {
+            throw error
+        }
     }
 }

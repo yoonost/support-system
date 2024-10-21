@@ -17,5 +17,6 @@ export class supportRoute {
         this.router.get('/:id', storageMiddleware, authorizeMiddleware, this.controller.ticket)
         this.router.post('/:id/send', validationMiddleware(addMessageDto), storageMiddleware, authorizeMiddleware, this.controller.send)
         this.router.put('/:id/close', storageMiddleware, authorizeMiddleware, this.controller.close)
+        this.router.put('/:id/assigned', storageMiddleware, authorizeMiddleware, this.controller.assigned)
     }
 }

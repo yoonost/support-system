@@ -11,6 +11,7 @@ export class supportController {
         this.ticket = this.ticket.bind(this)
         this.send = this.send.bind(this)
         this.close = this.close.bind(this)
+        this.assigned = this.assigned.bind(this)
     }
 
     public async tickets (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
@@ -48,6 +49,14 @@ export class supportController {
     public async close (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
             const { code, data } = await this.service.close(parseInt(req.params.id), req)
+            return responseUtil(code, data, res)
+        } catch (error) {
+            next(error)
+        }
+    }
+    public async assigned (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { code, data } = await this.service.assigned(parseInt(req.params.id), req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)

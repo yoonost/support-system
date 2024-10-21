@@ -1,22 +1,13 @@
 'use client'
 
 import { createContext, useState, useEffect, ReactNode } from 'react'
+import { Loading } from '@/components/loading'
+import { userDataInterface } from '@/app/interfaces'
 import cookie from 'js-cookie'
 import axios from 'axios'
 
-interface UserDataInterface {
-    loading: boolean
-    authenticated: boolean
-    user: {
-        id?: number
-        username?: string
-        email?: string
-        role?: string
-    }
-}
-
 const ContextData = createContext<{
-    data: UserDataInterface
+    data: userDataInterface
     updateData: (key: string, value: string | number | boolean) => void
 }>({
     data: {
@@ -33,7 +24,7 @@ const ContextData = createContext<{
 })
 
 function ProviderContext ({ children }: { children: ReactNode }): ReactNode {
-    const [data, setData] = useState<UserDataInterface>({
+    const [data, setData] = useState<userDataInterface>({
         loading: true,
         authenticated: false,
         user: {}
@@ -65,7 +56,7 @@ function ProviderContext ({ children }: { children: ReactNode }): ReactNode {
 
     return (
         <>
-            <ContextData.Provider value={{ data, updateData }}>{!data.loading && children}</ContextData.Provider>
+            <ContextData.Provider value={{ data, updateData }}>{!data.loading ? children : <Loading />}</ContextData.Provider>
         </>
     )
 }

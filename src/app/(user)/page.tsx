@@ -3,6 +3,7 @@
 import { useEffect, useState, ReactNode, useContext } from 'react'
 import axios, { AxiosResponse, AxiosError } from 'axios'
 import { TbZoomExclamation } from 'react-icons/tb'
+import { errorResponse, ticketsProps } from '@/app/interfaces'
 import { Link } from '@/components/link'
 import { Status } from '@/components/status'
 import { Alert } from '@/components/alert'
@@ -10,38 +11,16 @@ import { ContextData } from '@/libs/provider'
 import NextLink from 'next/link'
 import cookie from 'js-cookie'
 
-interface ticketProps {
-    ticket_id: number
-    subject: string
-    status: number
-    created_at: number
-    updated_at: number
-    creator: string
-    creator_name: string | null
-    source: number
-    assigned_id: number
-    assigned_name: string | null
-    last_message: string | null
-}
-
-interface ErrorResponse {
-    error: {
-        message?: string
-    }
-}
-
 export default function Page(): ReactNode {
     const { data } = useContext(ContextData)
-    const [ tickets, setTickets ] = useState<ticketProps[]>([])
+    const [ tickets, setTickets ] = useState<ticketsProps[]>([])
     const [ dangerAlert, setDangerAlert ] = useState<string>()
 
     const updateTickets = (): void => {
         axios.get(`http://localhost:8080/ticket/tickets`, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-        }).then((data: AxiosResponse): void => {
-            if (data.data.status) setTickets(data.data.data)
-            else setDangerAlert('Failed to fetch tickets. Server returned an error')
-        }).catch((error: AxiosError<ErrorResponse>): void => {
+        }).then((data: AxiosResponse): void => setTickets(data.data.data))
+        .catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setDangerAlert(error.response.data.error.message)
                 else setDangerAlert('No response from server. Please check your connection')
@@ -66,10 +45,10 @@ export default function Page(): ReactNode {
             </div>
             {dangerAlert ? <Alert title='Oops!' message={dangerAlert} severity={'danger'} variant={'primary'} style={'filled'} /> : null}
             <div className='flex flex-col space-y-3'>
-                {tickets.map((data: ticketProps, i: number): ReactNode => (
+                {tickets.map((data: ticketsProps, i: number): ReactNode => (
                     <NextLink key={i} href={`/ticket/${data.ticket_id}`} className='flex flex-col bg-palette-background-secondary hover:bg-palette-gray-5 p-3 rounded-lg cursor-pointer transition'>
                         <div className='flex flex-row justify-between items-center mb-1'>
-                            <span className='font-semibold text-sm truncate max-w-[90%]'>{data.subject}</span>
+                            <span className='font-semibold text-sm truncate max-w-[70%]'>{data.subject}</span>
                             <div className='flex flex-row space-x-1'>
                                 <Status status={data.status} />
                             </div>
