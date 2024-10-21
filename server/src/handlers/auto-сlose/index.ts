@@ -1,9 +1,9 @@
 import { FieldPacket, PoolConnection, RowDataPacket, storageCallback } from '../../storage'
 import { randomStringUtil } from '../../utils/randomString.util'
 
-const handler = async (storage: PoolConnection): Promise<void> => {
+async function autoCloseHandler (storage: PoolConnection): Promise<void> {
     const [ tickets ]: [ RowDataPacket[], FieldPacket[] ] =
-        await storage.query('SELECT ticket_id FROM tickets WHERE updated_at <= UNIX_TIMESTAMP() - 604800 AND status != 3')
+        await storage.query('SELECT ticket_id FROM tickets WHERE updated_at <= UNIX_TIMESTAMP() - 604800 AND status != 3 LIMIT 500')
     for (const ticket of tickets) {
         const messageId: string = randomStringUtil(32)
         const message: string = 'The ticket has been automatically closed due to inactivity over the past 7 days. If you need further assistance, please create a new ticket or contact our support team'
@@ -15,6 +15,6 @@ const handler = async (storage: PoolConnection): Promise<void> => {
 
 setInterval(async (): Promise<void> => {
     await storageCallback(async (storage: PoolConnection): Promise<void> => {
-        await handler(storage)
+        await autoCloseHandler (storage)
     })
 }, 10800)
