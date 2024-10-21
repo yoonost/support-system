@@ -49,25 +49,18 @@ function ProviderContext ({ children }: { children: ReactNode }): JSX.Element {
     useEffect(() => {
         if (sessionStorage.getItem('session')) {
             axios.get('http://localhost:8080/user/me', {
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('session')}`
-                }
+                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
             }).then((response) => {
                 if (response.status === 200) {
                     updateData('user', response.data.data)
                     updateData('authenticated', true)
                     updateData('loading', false)
                 } else {
-                    sessionStorage.removeItem('session')
+                    if (response.status === 401) sessionStorage.removeItem('session')
                     updateData('loading', false)
                 }
-            }).catch(() => {
-                sessionStorage.removeItem('session')
-                updateData('loading', false)
-            })
-        } else {
-            updateData('loading', false)
-        }
+            }).catch(() => updateData('loading', false))
+        } else updateData('loading', false)
     }, [])
 
     return (

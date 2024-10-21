@@ -32,7 +32,7 @@ export default function Page(): ReactNode {
                                 <Status status={data.status} />
                             </div>
                         </div>
-                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>{data.message}</span>
+                        <span className='h-8 truncate-text text-xs text-palette-gray-2'>{data.last_message}</span>
                     </NextLink>
                 ))}
             </div>
