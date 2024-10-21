@@ -17,7 +17,7 @@ export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert 
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }, [])
 
-    const onClickSend = (e: FormEvent<HTMLFormElement>): void => {
+    const onClickSubmit = (e: FormEvent<HTMLFormElement>): void => {
         e.preventDefault()
 
         const form = e.target as HTMLFormElement
@@ -53,22 +53,10 @@ export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert 
             ) : null}
             <div className='flex flex-col space-y-3 overflow-y-scroll scroll-sidebar p-5 h-full' ref={scrollRef}>
                 {ticket.messages.map((message: messageProps, i: number): ReactNode => {
-                    const senderMap: { [key: number]: string } = {
-                        1: message.sender_name || `#${message.sender}`,
-                        2: message.sender_name || message.sender,
-                        3: message.sender_name || `Telegram #${message.sender}`
-                    }
+                    const senderMap: { [key: number]: string } = { 1: message.sender_name || `#${message.sender}`, 2: message.sender_name || message.sender, 3: message.sender_name || `Telegram #${message.sender}` }
                     const sender: string = senderMap[message.source] || 'unknown'
-                    const roleClasses: { [key: number]: string } = {
-                        1: 'flex items-end justify-start',
-                        2: 'flex items-end justify-end',
-                        3: 'flex items-end justify-center'
-                    }
-                    const contentClasses: { [key: number]: string } = {
-                        1: 'bg-palette-gray-5',
-                        2: 'bg-palette-default-primary',
-                        3: 'text-sm text-palette-gray-3 py-2'
-                    }
+                    const roleClasses: { [key: number]: string } = { 1: 'flex items-end justify-start', 2: 'flex items-end justify-end', 3: 'flex items-end justify-center' }
+                    const contentClasses: { [key: number]: string } = { 1: 'bg-palette-gray-5', 2: 'bg-palette-default-primary', 3: 'text-sm text-palette-gray-3 py-2 text-center' }
                     return (
                         <div className={roleClasses[message.role]} key={i}>
                             <div className={`flex flex-col max-w-[50%] ${message.role === 3 ? 'items-center' : message.role === 1 ? 'items-start' : 'items-end'}`}>
@@ -90,7 +78,7 @@ export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert 
                 }).reverse()}
             </div>
             {ticket.status !== 3 && ticket.assigned_id === data.user.id && (
-                <form className='flex flex-row flex-1 space-x-3 p-5' onSubmit={onClickSend}>
+                <form className='flex flex-row flex-1 space-x-3 p-5' onSubmit={onClickSubmit}>
                     <Input id='message' divClassname='w-full' inputClassName='rounded-full w-full' size='small' placeholder='Enter a message...'/>
                     <Button className='rounded-full' loading={isLoading}>Send</Button>
                 </form>

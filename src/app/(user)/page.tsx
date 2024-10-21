@@ -19,8 +19,7 @@ export default function Page(): ReactNode {
     const updateTickets = (): void => {
         axios.get(`http://localhost:8080/ticket/tickets`, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-        }).then((data: AxiosResponse): void => setTickets(data.data.data))
-        .catch((error: AxiosError<errorResponse>): void => {
+        }).then((data: AxiosResponse): void => setTickets(data.data.data)).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setDangerAlert(error.response.data.error.message)
                 else setDangerAlert('No response from server. Please check your connection')

@@ -6,7 +6,8 @@ import { Button } from '@/components/button'
 import { isEmail, isEmpty, isLength, matches } from 'validator'
 import cookie from 'js-cookie'
 import Link from 'next/link'
-import axios from 'axios'
+import axios, {AxiosError, AxiosResponse} from 'axios'
+import {errorResponse} from "@/app/interfaces";
 
 export default function Page(): ReactNode {
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
@@ -35,22 +36,19 @@ export default function Page(): ReactNode {
         if (password !== rePassword) return setInputError({ input: 'rePassword', message: 'Passwords do not match' })
 
         setIsLoading (true)
+        setInputError({ input: '', message: '' })
 
-        try {
-            const { data } = await axios.post(`http://localhost:8080/authorize/sign-up`, { username, email, password })
-            if (data.error?.message) {
-                setInputError({ input: 'username', message: data.error.message })
-            } else {
-                cookie.set('session', data.data.sessionToken, { expires: 7 })
-                window.location.href = '/'
-            }
-        } catch (error) {
+        axios.post(`http://localhost:8080/authorize/sign-up`, { username, email, password }, {
+            headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
+        }).then((data: AxiosResponse): void => {
+            cookie.set('session', data.data.sessionToken, { expires: 7 })
+            window.location.href = '/'
+        }).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setInputError({ input: 'username', message: error.response.data.error.message })
                 else setInputError({ input: 'username', message: 'No response from server. Please check your connection' })
             } else setInputError({ input: 'username', message: 'An unexpected error occurred' })
-        }
-
+        })
 
         setIsLoading (false)
     }

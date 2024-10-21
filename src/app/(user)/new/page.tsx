@@ -33,8 +33,9 @@ export default function Page(): ReactNode {
 
         axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-        }).then((data: AxiosResponse): string => window.location.href = `/ticket/${data.data.ticketId}`)
-        .catch((error: AxiosError<errorResponse>): void => {
+        }).then((data: AxiosResponse): void => {
+            window.location.href = `/ticket/${data.data.data.ticketId}`
+        }).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setInputError({ input: 'subject', message: error.response.data.error.message })
                 else setDangerAlert('No response from server. Please check your connection')
@@ -42,7 +43,6 @@ export default function Page(): ReactNode {
         })
 
         setIsLoading (false)
-        form.reset()
     }
 
     return (

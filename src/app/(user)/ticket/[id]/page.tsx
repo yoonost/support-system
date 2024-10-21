@@ -25,9 +25,12 @@ export default function Page(): ReactNode {
     const updateTicket = (): void => {
         axios.get(`http://localhost:8080/ticket/${id}`, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-        }).then((data: AxiosResponse) => {
-            setTicket(data.data.data)
-        }).catch(() => window.location.href = '/')
+        }).then((data: AxiosResponse): void => setTicket(data.data.data)).catch((error: AxiosError<errorResponse>): void => {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.data?.error?.message) setDangerAlert(error.response.data.error.message)
+                else setDangerAlert('No response from server. Please check your connection')
+            } else setDangerAlert('An unexpected error occurred')
+        })
     }
 
     const onClickSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -47,8 +50,7 @@ export default function Page(): ReactNode {
         }).then((): void => {
             updateTicket()
             form.reset()
-        })
-        .catch((error: AxiosError<errorResponse>): void => {
+        }).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setInputError(error.response.data.error.message)
                 else setDangerAlert('No response from server. Please check your connection')
@@ -61,17 +63,14 @@ export default function Page(): ReactNode {
     const onClickClose = async (): Promise<void> => {
         setIsLoadingClose(true)
 
-        try {
-            const { data } = await axios.put(`http://localhost:8080/ticket/${id}/close`, null, {
-                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
-            })
-            if (!data.error?.message) updateTicket()
-        } catch (error) {
+        axios.put(`http://localhost:8080/ticket/${id}/close`, null, {
+            headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
+        }).then((): void => updateTicket()).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.data?.error?.message) setDangerAlert(error.response.data.error.message)
                 else setDangerAlert('No response from server. Please check your connection')
             } else setDangerAlert('An unexpected error occurred')
-        }
+        })
 
         setIsLoadingClose(false)
     }
@@ -130,7 +129,7 @@ export default function Page(): ReactNode {
                     const senderMap: { [key: number]: string } = { 1: message.sender_name || `#${message.sender}`, 2: message.sender_name || message.sender, 3: message.sender_name || `Telegram #${message.sender}` }
                     const sender: string = senderMap[message.source] || 'unknown'
                     const roleClasses: { [key: number]: string } = { 1: 'flex items-end justify-end', 2: 'flex items-end justify-start', 3: 'flex items-end justify-center' }
-                    const contentClasses: { [key: number]: string } = { 1: 'bg-palette-default-primary', 2: 'bg-palette-gray-5', 3: 'text-sm text-palette-gray-3 py-2' }
+                    const contentClasses: { [key: number]: string } = { 1: 'bg-palette-default-primary', 2: 'bg-palette-gray-5', 3: 'text-sm text-palette-gray-3 py-2 text-center' }
                     return (
                         <div className={roleClasses[message.role]} key={i}>
                             <div className={`flex flex-col max-w-[50%] ${message.role === 3 ? 'items-center' : message.role === 1 ? 'items-end' : 'items-start'}`}>

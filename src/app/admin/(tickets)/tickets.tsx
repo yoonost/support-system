@@ -19,10 +19,8 @@ export function Tickets (): ReactNode {
         axios.get(`http://localhost:8080/ticket/tickets?admin`, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
         }).then((data: AxiosResponse): void => {
-            if (data.data.status) {
-                setTickets(data.data.data)
-                setFilteredTickets(data.data.data)
-            }
+            setTickets(data.data.data)
+            setFilteredTickets(data.data.data)
         })
     }
 
