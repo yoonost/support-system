@@ -11,3 +11,15 @@ export const storage: Pool = createPool({
     connectionLimit: 100,
     queueLimit: 900
 })
+
+export const storageCallback = async (callback: (storage: PoolConnection) => Promise<void>): Promise<void> => {
+    let Storage: PoolConnection | undefined
+    try {
+        Storage = await storage.getConnection()
+        await callback(Storage)
+    } catch (error) {
+        console.error(error)
+    } finally {
+        if (Storage) Storage.release()
+    }
+}

@@ -26,7 +26,7 @@ export class supportService {
             throw error
         }
     }
-    public async ticket (ticketId: number, req: Request): Promise<{ code: number; data: string | object }> {
+    public async ticket (ticketId: string, req: Request): Promise<{ code: number; data: string | object }> {
         try {
             const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] = req.user?.role === 'admin' && (req.query.admin !== undefined)
                 ? await req.storage.query(`SELECT t.ticket_id, t.subject, t.status, t.created_at, t.updated_at, t.creator, (SELECT u.username FROM users u WHERE u.id = t.creator AND t.source = 1 LIMIT 1) as creator_name, t.source, t.assigned_id, (SELECT u.username FROM users u WHERE u.id = t.assigned_id LIMIT 1) as assigned_name FROM tickets t WHERE t.ticket_id = ? ORDER BY t.updated_at DESC`, [ ticketId ])
@@ -43,7 +43,7 @@ export class supportService {
             throw error
         }
     }
-    public async send (ticketId: number, message: string, req: Request): Promise<{ code: number; data: string | object }> {
+    public async send (ticketId: string, message: string, req: Request): Promise<{ code: number; data: string | object }> {
         try {
             const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
             const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] = isAdmin
@@ -70,7 +70,7 @@ export class supportService {
             throw error
         }
     }
-    public async close (ticketId: number, req: Request): Promise<{ code: number; data: string | object | number }> {
+    public async close (ticketId: string, req: Request): Promise<{ code: number; data: string | object | number }> {
         try {
             const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
             const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] = isAdmin
@@ -99,7 +99,7 @@ export class supportService {
             throw error
         }
     }
-    public async assigned (ticketId: number, req: Request): Promise<{ code: number; data: string | object }> {
+    public async assigned (ticketId: string, req: Request): Promise<{ code: number; data: string | object }> {
         try {
             const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
 

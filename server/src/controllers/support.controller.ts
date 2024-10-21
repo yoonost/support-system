@@ -32,7 +32,7 @@ export class supportController {
     }
     public async ticket (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { code, data } = await this.service.ticket(parseInt(req.params.id), req)
+            const { code, data } = await this.service.ticket(req.params.id, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
@@ -40,7 +40,7 @@ export class supportController {
     }
     public async send (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { code, data } = await this.service.send(parseInt(req.params.id), req.body.message, req)
+            const { code, data } = await this.service.send(req.params.id, req.body.message, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
@@ -48,7 +48,7 @@ export class supportController {
     }
     public async close (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { code, data } = await this.service.close(parseInt(req.params.id), req)
+            const { code, data } = await this.service.close(req.params.id, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)
@@ -56,7 +56,7 @@ export class supportController {
     }
     public async assigned (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { code, data } = await this.service.assigned(parseInt(req.params.id), req)
+            const { code, data } = await this.service.assigned(req.params.id, req)
             return responseUtil(code, data, res)
         } catch (error) {
             next(error)

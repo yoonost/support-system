@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { responseUtil } from '../utils/response.util'
 
 export const errorMiddleware = (err: Error, req: Request, res: Response, _: NextFunction): Response => {
-    console.error(err)
+    console.error(`[ERROR] ${err.message}`)
     return responseUtil(500, 'An internal server error occurred. Please try again later or contact support', res)
 }
 
