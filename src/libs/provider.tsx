@@ -1,9 +1,7 @@
 'use client'
 
 import { createContext, useState, useEffect, ReactNode } from 'react'
-import { Transition } from '@headlessui/react'
-import logotype from '@/images/favicon.png'
-import Image from 'next/image'
+import cookie from 'js-cookie'
 import axios from 'axios'
 
 interface UserDataInterface {
@@ -11,6 +9,7 @@ interface UserDataInterface {
     authenticated: boolean
     user: {
         id?: number
+        username?: string
         email?: string
         role?: string
     }
@@ -25,6 +24,7 @@ const ContextData = createContext<{
         authenticated: false,
         user: {
             id: undefined,
+            username: undefined,
             email: undefined,
             role: undefined
         }
@@ -32,14 +32,14 @@ const ContextData = createContext<{
     updateData: () => {}
 })
 
-function ProviderContext ({ children }: { children: ReactNode }): JSX.Element {
+function ProviderContext ({ children }: { children: ReactNode }): ReactNode {
     const [data, setData] = useState<UserDataInterface>({
         loading: true,
         authenticated: false,
         user: {}
     })
 
-    const updateData = (key: string, value: string | number | boolean) => {
+    const updateData = (key: string, value: string | number | boolean): void => {
         setData((prevData) => ({
             ...prevData,
             [key]: value
@@ -47,19 +47,19 @@ function ProviderContext ({ children }: { children: ReactNode }): JSX.Element {
     }
 
     useEffect(() => {
-        if (sessionStorage.getItem('session')) {
+        if (cookie.get('session')) {
             axios.get('http://localhost:8080/user/me', {
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
-            }).then((response) => {
+                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
+            }).then((response): void => {
                 if (response.status === 200) {
                     updateData('user', response.data.data)
                     updateData('authenticated', true)
                     updateData('loading', false)
                 } else {
-                    if (response.status === 401) sessionStorage.removeItem('session')
+                    if (response.status === 401) cookie.remove('session')
                     updateData('loading', false)
                 }
-            }).catch(() => updateData('loading', false))
+            }).catch((): void => updateData('loading', false))
         } else updateData('loading', false)
     }, [])
 

@@ -36,7 +36,7 @@ export class authorizeService {
     }
     private async createSession (userId: number, req: Request) {
         const token: string = randomStringUtil(128)
-        const expires: number = Math.floor(Date.now() / 1000) + 10800
+        const expires: number = Math.floor(Date.now() / 1000) + 604800
 
         await req.storage.query('INSERT INTO sessions (userId, token, authorizationTime, expirationTime) VALUES (?, ?, UNIX_TIMESTAMP(), ?)', [ userId, token, expires ])
 

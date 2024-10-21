@@ -4,6 +4,7 @@ import { FormEvent, ReactNode, useState } from 'react'
 import { Input } from '@/components/input'
 import { Button } from '@/components/button'
 import { isEmail, isEmpty, isLength, matches } from 'validator'
+import cookie from 'js-cookie'
 import Link from 'next/link'
 import axios from 'axios'
 
@@ -40,13 +41,16 @@ export default function Page(): ReactNode {
             if (data.error?.message) {
                 setInputError({ input: 'username', message: data.error.message })
             } else {
-                sessionStorage.setItem('session', data.data.sessionToken)
+                cookie.set('session', data.data.sessionToken, { expires: 7 })
                 window.location.href = '/'
             }
         } catch (error) {
-            if (error?.response?.data?.error?.message) setInputError({ input: 'username', message: error?.response?.data?.error?.message })
-            else setInputError({ input: 'username', message: 'No response from server. Please check your connection.' })
+            if (axios.isAxiosError(error)) {
+                if (error.response?.data?.error?.message) setInputError({ input: 'username', message: error.response.data.error.message })
+                else setInputError({ input: 'username', message: 'No response from server. Please check your connection' })
+            } else setInputError({ input: 'username', message: 'An unexpected error occurred' })
         }
+
 
         setIsLoading (false)
     }
@@ -54,7 +58,7 @@ export default function Page(): ReactNode {
     return (
         <>
             <h1 className='font-semibold text-2xl'>Sign up</h1>
-            <form onSubmit={(e: FormEvent<HTMLFormElement>) => onClickSubmit(e)}>
+            <form onSubmit={onClickSubmit}>
                 <div className='flex flex-col space-y-3 mt-5'>
                     <Input id='username' label='Username' severity={inputError.input === 'username' ? 'danger' : 'primary'} desc={inputError.input === 'username' ? inputError.message : ''} />
                     <Input id='email' label='Email' severity={inputError.input === 'email' ? 'danger' : 'primary'} desc={inputError.input === 'email' ? inputError.message : ''} />

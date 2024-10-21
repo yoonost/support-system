@@ -9,6 +9,7 @@ import axios, { AxiosResponse } from 'axios'
 import { isLength, isEmpty } from 'validator'
 import { Alert } from '@/components/alert'
 import moment from 'moment'
+import cookie from 'js-cookie'
 
 interface ticketProps {
     ticket_id: number
@@ -45,7 +46,7 @@ export default function Page(): ReactNode {
 
     const updateTicket = (): void => {
         axios.get(`http://localhost:8080/ticket/${id}`, {
-            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
+            headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
         }).then((data: AxiosResponse) => {
             setTicket(data.data.data)
         }).catch(() => window.location.href = '/')
@@ -65,7 +66,7 @@ export default function Page(): ReactNode {
 
         try {
             const { data } = await axios.post(`http://localhost:8080/ticket/${id}/send`, { message }, {
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
+                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
             })
             if (!data.error?.message) {
                 updateTicket()
@@ -107,9 +108,9 @@ export default function Page(): ReactNode {
 
     return ticket && (
         <>
-            <div className='flex flex-row items-center justify-between mb-8'>
-                <div className='flex flex-row items-center space-x-2'>
-                    <span className='text-3xl font-semibold'>{ticket.subject}</span>
+            <div className='flex flex-row items-center space-x-4 justify-between mb-8'>
+                <div className='flex flex-row items-center space-x-2 truncate whitespace-nowrap'>
+                    <span className='text-3xl font-semibold truncate'>{ticket.subject}</span>
                     <span className='text-xl text-palette-gray-2'>(# {ticket.ticket_id})</span>
                 </div>
                 <Link href={'/'} variant={'primary'}>Back to home</Link>
@@ -164,7 +165,7 @@ export default function Page(): ReactNode {
                                             <span className='text-palette-gray-3 text-xs'>{moment(message.created_at * 1000).endOf('seconds').fromNow()}</span>
                                         </div>
                                         <div className={`${contentClasses[message.role]} px-3 py-2 rounded-lg`}>
-                                            <span className='text-sm text-palette-gray-1'>{message.message}</span>
+                                            <span className='text-sm text-palette-gray-1 break-words break-all'>{message.message}</span>
                                         </div>
                                     </>
                                 )}

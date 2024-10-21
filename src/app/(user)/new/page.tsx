@@ -6,11 +6,14 @@ import { Input } from '@/components/input'
 import { Textarea } from '@/components/textarea'
 import { Button } from '@/components/button'
 import { isEmpty, isLength } from 'validator'
+import { Alert } from '@/components/alert'
 import axios from 'axios'
+import cookie from 'js-cookie'
 
 export default function Page(): ReactNode {
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
     const [ inputError, setInputError ] = useState({ input: '', message: '' })
+    const [ dangerAlert, setDangerAlert ] = useState<string>()
 
     const onClickSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault()
@@ -29,14 +32,16 @@ export default function Page(): ReactNode {
 
         try {
             const { data } = await axios.post(`http://localhost:8080/ticket/new`, { subject, message }, {
-                headers: { 'Authorization': `Bearer ${sessionStorage.getItem('session')}` }
+                headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
             })
             if (data.error?.message) {
                 setInputError({ input: 'subject', message: data.error.message })
             } else window.location.href = `/chat/${data.data.ticketId}`
         } catch (error) {
-            if (error?.response?.data?.error?.message) setInputError({ input: 'subject', message: error?.response?.data?.error?.message })
-            else setInputError({ input: 'subject', message: 'No response from server. Please check your connection.' })
+            if (axios.isAxiosError(error)) {
+                if (error.response?.data?.error?.message) setInputError({ input: 'subject', message: error.response.data.error.message })
+                else setDangerAlert('No response from server. Please check your connection')
+            } else setDangerAlert('An unexpected error occurred')
         }
 
         setIsLoading (false)
@@ -48,6 +53,7 @@ export default function Page(): ReactNode {
                 <h1 className='text-palette-primary text-3xl font-semibold'>New ticket</h1>
                 <Link href={'/'} variant={'primary'}>Back to home</Link>
             </div>
+            {dangerAlert ? <Alert title='Oops!' message={dangerAlert} severity={'danger'} variant={'primary'} style={'filled'} /> : null}
             <form onSubmit={(e: FormEvent<HTMLFormElement>) => onClickSubmit(e)}>
                 <div className='flex flex-col space-y-3 mt-5'>
                     <Input id='subject' label='Subject' severity={inputError.input === 'subject' ? 'danger' : 'primary'} desc={inputError.input === 'subject' ? inputError.message : ''} />
