@@ -36,7 +36,7 @@ export class application {
 
     private initializeRoutes(routes: routeProps[]): void {
         routes.forEach((route: routeProps): void => {
-            console.log(`✅ Registering route for ${route.path}`)
+            console.debug(`[INFO] Registering route for ${route.path}`)
             this.app.use(route.path, route.router)
         })
     }
@@ -48,7 +48,7 @@ export class application {
 
     public listen(): void {
         this.app.listen(this.port, (): void => {
-            console.log(`✅ App listening on the port ${this.port}`)
+            console.log(`[INFO] App listening on the port ${this.port}`)
         })
     }
 }

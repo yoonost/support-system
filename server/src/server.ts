@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './handlers/auto-сlose'
 
 import { application } from './application'
 import { authorizeRoute } from './routes/authorize.route'
