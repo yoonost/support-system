@@ -38,6 +38,8 @@ function ProviderContext ({ children }: { children: ReactNode }): ReactNode {
     }
 
     useEffect(() => {
+        console.log(cookie.get('session'))
+
         if (cookie.get('session')) {
             axios.get('http://localhost:8080/user/me', {
                 headers: { 'Authorization': `Bearer ${cookie.get('session')}` }

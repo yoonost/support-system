@@ -41,7 +41,7 @@ export default function Page(): ReactNode {
         axios.post(`http://localhost:8080/authorize/sign-up`, { username, email, password }, {
             headers: { 'Authorization': `Bearer ${cookie.get('session')}` }
         }).then((data: AxiosResponse): void => {
-            cookie.set('session', data.data.sessionToken, { expires: 7 })
+            cookie.set('session', data.data.data.sessionToken, { expires: 7 })
             window.location.href = '/'
         }).catch((error: AxiosError<errorResponse>): void => {
             if (axios.isAxiosError(error)) {
