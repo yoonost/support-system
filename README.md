@@ -1,5 +1,6 @@
-
 # Customer Support System
+
+[![tests](https://github.com/yoonost/support-system/actions/workflows/tests.yml/badge.svg)](https://github.com/yoonost/support-system/actions/workflows/tests.yml)
 
 ## Overview
 This is a comprehensive customer support system that allows users to submit tickets through multiple channels: website, email, and Telegram. All tickets are synchronized within the system, ensuring smooth management and enabling support agents to respond more quickly to customer requests.
