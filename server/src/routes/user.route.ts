@@ -6,7 +6,7 @@ import { userController } from '../controllers/user.controller'
 export class userRoute {
     private controller: userController = new userController()
 
-    public path: string = '/user'
+    public path: string = '/user' // eslint-disable-line @typescript-eslint/no-inferrable-types
     public router: Router = Router()
 
     constructor() {

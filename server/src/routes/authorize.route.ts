@@ -7,7 +7,7 @@ import { authorizeController } from '../controllers/authorize.controller'
 export class authorizeRoute {
     private controller: authorizeController = new authorizeController()
 
-    public path: string = '/authorize'
+    public path: string = '/authorize' // eslint-disable-line @typescript-eslint/no-inferrable-types
     public router: Router = Router()
 
     constructor() {

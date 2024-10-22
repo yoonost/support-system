@@ -1,0 +1,39 @@
+name: frontend
+
+on:
+  push:
+    branches: [ "main", "development" ]
+  pull_request:
+    branches: [ "main", "development" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Navigate to Frontend Directory
+        run: cd frontend
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Lint Code
+        run: npm run lint
+        working-directory: ./frontend
+
+      - name: Build Project
+        run: npm run build
+        working-directory: ./frontend
