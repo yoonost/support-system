@@ -1,19 +1,19 @@
-import {useRef, useEffect, ReactNode, FormEvent, useState} from 'react'
+import { useRef, useEffect, ReactNode, FormEvent, useState, Fragment } from 'react'
 import { ControlProps } from './page'
 import { Input } from '@/components/input'
 import { Button } from '@/components/button'
-import {errorResponse, messageProps} from '@/app/interfaces'
+import { errorResponse, messageProps } from '@/app/interfaces'
 import moment from 'moment/moment'
-import {Alert} from "@/components/alert";
-import {isEmpty, isLength} from "validator";
-import axios, {AxiosError} from "axios";
-import cookie from "js-cookie";
+import { Alert } from '@/components/alert'
+import { isEmpty, isLength } from 'validator'
+import axios, { AxiosError } from 'axios'
+import cookie from 'js-cookie'
 
 export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert }: ControlProps): ReactNode {
     const scrollRef = useRef<HTMLDivElement>(null)
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
 
-    useEffect(() => {
+    useEffect((): void => {
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }, [])
 
@@ -59,7 +59,7 @@ export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert 
                     const contentClasses: { [key: number]: string } = { 1: 'bg-palette-gray-5', 2: 'bg-palette-default-primary', 3: 'text-sm text-palette-gray-3 py-2 text-center' }
                     return (
                         <div className={roleClasses[message.role]} key={i}>
-                            <div className={`flex flex-col max-w-[50%] ${message.role === 3 ? 'items-center' : message.role === 1 ? 'items-start' : 'items-end'}`}>
+                            <div className={`flex flex-col max-w-[70%] ${message.role === 3 ? 'items-center' : message.role === 1 ? 'items-start' : 'items-end'}`}>
                                 {message.role !== 3 && (
                                     <>
                                         <div className='flex flex-row items-center gap-x-1 mb-1 flex-wrap'>
@@ -67,7 +67,14 @@ export function Chat ({ data, ticket, updateTicket, dangerAlert, setDangerAlert 
                                             <span className='text-palette-gray-3 text-xs'>{moment(message.created_at * 1000).endOf('seconds').fromNow()}</span>
                                         </div>
                                         <div className={`${contentClasses[message.role]} px-3 py-2 rounded-lg`}>
-                                            <span className='text-sm text-palette-gray-1 break-words break-all'>{message.message}</span>
+                                            <span className='text-sm text-palette-gray-1 break-words break-all'>
+                                                {message.message.split('\n').map((line: string, index: number, array: string[]): ReactNode => (
+                                                    <Fragment key={index}>
+                                                        {line}
+                                                        {index < array.length - 1 && line !== '' && <br/>}
+                                                    </Fragment>
+                                                ))}
+                                            </span>
                                         </div>
                                     </>
                                 )}

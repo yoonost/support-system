@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, ReactNode, useState, FormEvent } from 'react'
-import {ticketProps, messageProps, errorResponse} from '@/app/interfaces'
+import { useEffect, ReactNode, useState, FormEvent, Fragment } from 'react'
+import { ticketProps, messageProps, errorResponse } from '@/app/interfaces'
 import { useParams } from 'next/navigation'
 import { Link } from '@/components/link'
 import { Button } from '@/components/button'
 import { Textarea } from '@/components/textarea'
-import axios, {AxiosError, AxiosResponse} from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import { isLength, isEmpty } from 'validator'
 import { Alert } from '@/components/alert'
 import moment from 'moment'
@@ -140,7 +140,14 @@ export default function Page(): ReactNode {
                                             <span className='text-palette-gray-3 text-xs'>{moment(message.created_at * 1000).endOf('seconds').fromNow()}</span>
                                         </div>
                                         <div className={`${contentClasses[message.role]} px-3 py-2 rounded-lg`}>
-                                            <span className='text-sm text-palette-gray-1 break-words break-all'>{message.message}</span>
+                                            <span className='text-sm text-palette-gray-1 break-words break-all'>
+                                                {message.message.split('\n').map((line: string, index: number, array: string[]): ReactNode => (
+                                                    <Fragment key={index}>
+                                                        {line}
+                                                        {index < array.length - 1 && line !== '' && <br/>}
+                                                    </Fragment>
+                                                ))}
+                                            </span>
                                         </div>
                                     </>
                                 )}

@@ -1,0 +1,12 @@
+<mjml>
+    <mj-body>
+        <mj-section background-color="#14161A" padding="20px 20px 40px 20px" border-radius="20px">
+            <mj-column>
+                <mj-image width="50px" src="https://i.imgur.com/0d14s87.png" padding="20px" align="left" />
+                <mj-text font-size="32px" color="#EBECF0" font-family="helvetica" align="left">Ticket Closed Confirmation</mj-text>
+                <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">Your ticket with number {{ticket_id}} has been successfully closed. We believe that the issue has been resolved.</mj-text>
+                <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>
