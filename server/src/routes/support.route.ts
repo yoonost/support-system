@@ -8,7 +8,7 @@ import { supportController } from '../controllers/support.controller'
 export class supportRoute {
     private controller: supportController = new supportController()
 
-    public path: string = '/ticket'
+    public path: string = '/ticket' // eslint-disable-line @typescript-eslint/no-inferrable-types
     public router: Router = Router()
 
     constructor() {

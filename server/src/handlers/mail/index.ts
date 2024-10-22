@@ -9,9 +9,9 @@ let imapClient: Imap
 
 function connectToMailBox (): void {
     imapClient = new Imap({
-        user: process.env.IMAP_USER!,
-        password: process.env.IMAP_PASS!,
-        host: process.env.IMAP_HOST!,
+        user: process.env.IMAP_USER || '',
+        password: process.env.IMAP_PASS || '',
+        host: process.env.IMAP_HOST || '',
         port: 993,
         tls: true
     })
@@ -59,19 +59,26 @@ function fetchAndParseMessage (messageId: number): void {
 
 async function messageHandler (storage: PoolConnection, parsed: ParsedMail): Promise<void> {
     try {
-        const email: string | undefined = parsed.from?.text.match(/<?([^<>]+@[^<>]+)>?/)?.[1]
+        const emailMatch = parsed.from?.text.match(/<?([^<>]+@[^<>]+)>?/)
+        if (!emailMatch) {
+            console.log('[MAIL] Error: No email found in parsed message')
+            return
+        }
+
+        const email: string = emailMatch[1]
         const messageId: string | undefined = parsed.messageId?.toString().replace(/[<>]/g, '')
         const inReplyTo: string | undefined = parsed.inReplyTo?.toString().replace(/[<>]/g, '')
         const subject: string | undefined = parsed.subject?.toString()
         const text: string = new EmailReplyParser().parseReply(<string>parsed.text?.toString())
 
-        if (!email && !messageId && !text) return
+        if (!email && !messageId && !text)
+            return console.log('[MAIL] Error reading message info')
 
         if (!inReplyTo) {
             const [ ticket ]: [ ResultSetHeader, FieldPacket[] ] =
                 await storage.query('INSERT INTO tickets (subject, status, created_at, updated_at, creator, source) VALUES (?, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?, 2)', [ subject ? subject : 'Ticket without a title', email ])
             await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticket.insertId, text, email ])
-            sendMail(email!, `Confirmation of sending ticket #${ticket.insertId}`, 'ticket-confirm', { ticket_id: ticket.insertId.toString() })
+            sendMail(email, `Confirmation of sending ticket #${ticket.insertId}`, 'ticket-confirm', { ticket_id: ticket.insertId.toString() })
         } else {
             const [ ticketId ]: [ RowDataPacket[], FieldPacket[] ] =
                 await storage.query('SELECT ticket_id FROM messages WHERE message_id = ? LIMIT 1', [ inReplyTo ])
@@ -85,7 +92,7 @@ async function messageHandler (storage: PoolConnection, parsed: ParsedMail): Pro
                     await storage.query('SELECT ticket_id FROM tickets WHERE subject = ? AND status != 3 AND creator = ? AND source = 2 LIMIT 1', [ subject?.replace('Re: ', ''), email ])
 
                 if (ticketId.length === 0) return
-                    sendMail(email!, 'Error when updating a ticket', 'ticket-error')
+                    sendMail(email, 'Error when updating a ticket', 'ticket-error')
 
                 await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticketId[0].ticket_id, text, email ])
             } else

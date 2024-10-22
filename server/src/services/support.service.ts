@@ -152,7 +152,7 @@ export class supportService {
                 await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 3, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, req.user?.id ])
                 await req.storage.query('UPDATE tickets SET assigned_id = ?, updated_at = UNIX_TIMESTAMP(), status = ? WHERE ticket_id = ? LIMIT 1', [ isUnassigned ? req.user?.id : null, isUnassigned ? 2 : 1, ticketId ])
             } else {
-                return { code: 400, data: 'This ticket is assigned to another administrator' };
+                return { code: 400, data: 'This ticket is assigned to another administrator' }
             }
 
             return { code: 200, data: { ticketId: ticket[0].ticket_id } }

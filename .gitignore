@@ -1,7 +1,7 @@
-.idea
-.next
-node_modules
-package-lock.json
+frontend/.idea
+frontend/.next
+frontend/node_modules
+frontend/package-lock.json
 server/.idea
 server/.env
 server/dist

@@ -15,7 +15,7 @@ const sendMail = (
     subject: string,
     template: string,
     params: { [key: string]: string | object[] } = {},
-    inReplyTo: string = '',
+    inReplyTo?: string,
     references: string[] = []
 ): void => {
     const mailOptions: any = {
@@ -31,7 +31,7 @@ const sendMail = (
     }
 
     transporter.sendMail(mailOptions).then().catch((err: Error): void => {
-        console.log('Error sending mail: %s', err.message)
+        console.log('[SMTP] Error sending mail: %s', err.message)
     })
 }
 
