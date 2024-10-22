@@ -1,0 +1,23 @@
+<mjml>
+    <mj-body>
+        <mj-section background-color="#14161A" padding="20px 20px 40px 20px" border-radius="20px">
+            <mj-column>
+                <mj-image width="50px" src="https://i.imgur.com/0d14s87.png" padding="20px" align="left" />
+                <mj-text font-size="32px" color="#EBECF0" font-family="helvetica" align="left">New reply to ticket #{{ticket_id}}</mj-text>
+                {{#each messages}}
+                    <mj-section background-color="#282933" padding="15px" border-radius="10px">
+                        <mj-column width="60%">
+                            <mj-text font-size="16px" color="#FFFFFF" font-family="helvetica" align="left" css-class="no-wrap-text">{{this.sender}}</mj-text>
+                        </mj-column>
+                        <mj-column width="40%">
+                            <mj-text font-size="14px" color="#A4A8B2" font-family="helvetica" align="right">{{this.created_at}}</mj-text>
+                        </mj-column>
+                        <mj-column width="100%">
+                            <mj-text font-size="16px" color="#FFFFFF" font-family="helvetica" align="left">{{this.message}}</mj-text>
+                        </mj-column>
+                    </mj-section>
+                {{/each}}
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response, Router} from 'express'
+import express, { Router } from 'express'
 import { json as bodyParserJson, urlencoded as bodyParserUrlencoded } from 'body-parser'
 import { express as expressUserAgent } from 'express-useragent'
 import { errorMiddleware, notfoundMiddleware } from './middlewares/error.middleware'

@@ -1,4 +1,4 @@
-import { IsString, IsNumber, Length, Min } from 'class-validator'
+import { IsString, Length } from 'class-validator'
 
 export class newTicketDto {
     @IsString({ message: 'Subject must be a string' })

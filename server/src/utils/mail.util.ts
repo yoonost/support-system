@@ -1,6 +1,5 @@
 import { createTransport, SentMessageInfo } from 'nodemailer'
-import { readFileSync } from 'fs'
-import mjml from 'mjml'
+import { generate } from './mjml.util'
 
 const transporter: SentMessageInfo = createTransport({
     host: 'smtp.mail.ru',
@@ -15,20 +14,15 @@ const sendMail = (
     email: string,
     subject: string,
     template: string,
-    params: { [key: string]: string } = {},
+    params: { [key: string]: string | object[] } = {},
     inReplyTo: string = '',
     references: string[] = []
 ): void => {
-    let htmlMessage: string = readFileSync(`./src/mjmls/${template}.mjml`, 'utf8')
-
-    for (const [ key, value ] of Object.entries(params))
-        htmlMessage = htmlMessage.replace(new RegExp(`{${key}}`, 'g'), value)
-
     const mailOptions: any = {
         from: `Support System <support@ping-up.online>`,
         to: email,
         subject: subject,
-        html: mjml(htmlMessage).html,
+        html: generate(template, params),
     }
 
     if (inReplyTo && references) {

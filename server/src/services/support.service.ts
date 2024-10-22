@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { FieldPacket, ResultSetHeader, RowDataPacket } from '../storage'
 import { randomStringUtil } from '../utils/randomString.util'
 import sendMail from '../utils/mail.util'
+import moment from 'moment'
 
 export class supportService {
     public async tickets (req: Request): Promise<{ code: number; data: string | object }> {
@@ -67,15 +68,25 @@ export class supportService {
             await req.storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP() WHERE ticket_id = ? LIMIT 1', [ ticketId ])
 
             if (isAdmin && role === 2 && ticket[0].source === 2) {
-                /*const [ messages ]: [ RowDataPacket[], FieldPacket[] ] =
-                    await req.storage.query('SELECT m.message_id, m.message, m.sender, (SELECT u.username FROM users u WHERE u.id = m.sender AND m.source = 1 LIMIT 1) as sender_name, created_at FROM messages m WHERE m.ticket_id = ? AND m.role != 3', [ ticketId ])
-
+                const [ messages ]: [ RowDataPacket[], FieldPacket[] ] =
+                    await req.storage.query('SELECT m.message_id, m.message, m.sender, m.source, (SELECT u.username FROM users u WHERE u.id = m.sender AND m.source = 1 LIMIT 1) as sender_name, created_at FROM messages m WHERE m.ticket_id = ? AND m.role != 3', [ ticketId ])
                 const messageIdsArray: string[] = messages.map((message: RowDataPacket): string => message.message_id)
-                sendMail(ticket[0].creator, `Re: ${ticket[0].subject}`, generateTicketNotify(
-                    'Ticket Closed Confirmation',
-                    `Your ticket with number ${ticket[0].ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
-                    'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
-                ), messageIdsArray[messageIdsArray.length - 1], messageIdsArray)*/
+
+                sendMail(ticket[0].creator, `Re: ${ticket[0].subject}`, 'ticket-reply', {
+                    ticket_id: ticketId,
+                    messages: messages.map((message: RowDataPacket) => {
+                        const senderMap: { [key: number]: string } = {
+                            1: message.sender_name || `#${message.sender}`,
+                            2: message.sender_name || message.sender,
+                            3: message.sender_name || `Telegram #${message.sender}`
+                        }
+                        return {
+                            sender: senderMap[message.source] || 'unknown',
+                            created_at: moment(message.created_at * 1000).format("MMM Do YY"),
+                            message: message.message
+                        }
+                    }).reverse()
+                }, messageIdsArray[messageIdsArray.length - 1], messageIdsArray)
             }
 
             return { code: 200, data: { messageId } }
@@ -108,11 +119,7 @@ export class supportService {
             await req.storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP(), status = 3 WHERE ticket_id = ? LIMIT 1', [ ticketId ])
 
             if (isAdmin && role === 2 && ticket[0].source === 2) {
-                /*sendMail(ticket[0].creator, `Ticket #${ticket[0].ticket_id} has been closed`, generateTicketNotify(
-                    'Ticket Closed Confirmation',
-                    `Your ticket with number ${ticket[0].ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
-                    'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
-                ))*/
+                sendMail(ticket[0].creator, `Ticket #${ticket[0].ticket_id} has been closed`, 'ticket-closed', { ticket_id: ticket[0].ticket_id })
             }
 
             return { code: 200, data: { ticketId: ticket[0].ticket_id } }
@@ -141,11 +148,11 @@ export class supportService {
             const isUnassigned: boolean = ticket[0].assigned_id === null
 
             if (isUnassigned || isAssignedToUser) {
-                const message = isUnassigned ? 'The administrator proceeded to execute the ticket' : 'The administrator has stopped working on the ticket. Wait for another administrator to be assigned';
+                const message: string = isUnassigned ? 'The administrator proceeded to execute the ticket' : 'The administrator has stopped working on the ticket. Wait for another administrator to be assigned';
                 await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 3, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, req.user?.id ])
                 await req.storage.query('UPDATE tickets SET assigned_id = ?, updated_at = UNIX_TIMESTAMP(), status = ? WHERE ticket_id = ? LIMIT 1', [ isUnassigned ? req.user?.id : null, isUnassigned ? 2 : 1, ticketId ])
             } else {
-                return { code: 200, data: 'This ticket is assigned to another administrator' };
+                return { code: 400, data: 'This ticket is assigned to another administrator' };
             }
 
             return { code: 200, data: { ticketId: ticket[0].ticket_id } }

@@ -1,0 +1,12 @@
+<mjml>
+    <mj-body>
+        <mj-section background-color="#14161A" padding="20px 20px 40px 20px" border-radius="20px">
+            <mj-column>
+                <mj-image width="50px" src="https://i.imgur.com/0d14s87.png" padding="20px" align="left" />
+                <mj-text font-size="32px" color="#EBECF0" font-family="helvetica" align="left">Error when updating a ticket</mj-text>
+                <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">We have successfully received your request, but an error occurred while processing it. Please check the information and try again.</mj-text>
+                <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">If the error persists, feel free to contact our support team or manually update the ticket through our support system.</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

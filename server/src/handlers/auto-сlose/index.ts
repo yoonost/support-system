@@ -12,11 +12,7 @@ async function autoCloseHandler (storage: PoolConnection): Promise<void> {
         await storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP(), status = 3 WHERE ticket_id = ? LIMIT 1', [ ticket.ticket_id ])
 
         if (ticket.source === 2) {
-            /*sendMail(ticket.creator, `Ticket #${ticket.ticket_id} has been closed`, generateTicketNotify(
-                'Ticket Closed Confirmation',
-                `Your ticket with number ${ticket.ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
-                'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
-            ))*/
+            sendMail(ticket.creator, `Ticket #${ticket.ticket_id} has been closed`, 'ticket-closed', { ticket_id: ticket[0].ticket_id })
         }
 
         console.log(`[INFO] The handler automatically closed ticket #${ticket.ticket_id}`)
@@ -27,4 +23,4 @@ setInterval(async (): Promise<void> => {
     await storageCallback(async (storage: PoolConnection): Promise<void> => {
         await autoCloseHandler (storage)
     })
-}, 10800)
+}, 3600)

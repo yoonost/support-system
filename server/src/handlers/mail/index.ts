@@ -73,9 +73,23 @@ async function messageHandler (storage: PoolConnection, parsed: ParsedMail): Pro
             await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticket.insertId, text, email ])
             sendMail(email!, `Confirmation of sending ticket #${ticket.insertId}`, 'ticket-confirm', { ticket_id: ticket.insertId.toString() })
         } else {
-            const [ reply ]: [ RowDataPacket[], FieldPacket[] ] =
+            const [ ticketId ]: [ RowDataPacket[], FieldPacket[] ] =
                 await storage.query('SELECT ticket_id FROM messages WHERE message_id = ? LIMIT 1', [ inReplyTo ])
-            await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, reply[0].ticket_id, text, email ])
+
+            if (ticketId.length === 0) {
+                // If a support agent sends 2 or more messages at the same time without user response, an error occurs that the system...
+                // cannot find the messageId. In this case we will use a “crutch” and search for the request body and the same email, status...
+                // and ticket creation method. To display the message correctly and not to cause misunderstandings between support and client
+
+                const [ ticketId ]: [ RowDataPacket[], FieldPacket[] ] =
+                    await storage.query('SELECT ticket_id FROM tickets WHERE subject = ? AND status != 3 AND creator = ? AND source = 2 LIMIT 1', [ subject?.replace('Re: ', ''), email ])
+
+                if (ticketId.length === 0) return
+                    sendMail(email!, 'Error when updating a ticket', 'ticket-error')
+
+                await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticketId[0].ticket_id, text, email ])
+            } else
+                await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticketId[0].ticket_id, text, email ])
         }
     } catch (err) {
         console.log('[MAIL] Read error', err)
