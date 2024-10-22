@@ -1,7 +1,8 @@
-import Imap, { ImapMessageBodyInfo, ImapMessage, Box } from 'imap'
+import Imap, { ImapMessageBodyInfo, ImapMessage } from 'imap'
 import { FieldPacket, PoolConnection, ResultSetHeader, RowDataPacket, storageCallback } from '../../storage'
 import { ParsedMail, simpleParser } from 'mailparser'
 import EmailReplyParser from 'email-reply-parser'
+import sendMail from '../../utils/mail.util'
 import { Stream } from 'node:stream'
 
 let imapClient: Imap
@@ -64,10 +65,13 @@ async function messageHandler (storage: PoolConnection, parsed: ParsedMail): Pro
         const subject: string | undefined = parsed.subject?.toString()
         const text: string = new EmailReplyParser().parseReply(<string>parsed.text?.toString())
 
+        if (!email && !messageId && !text) return
+
         if (!inReplyTo) {
             const [ ticket ]: [ ResultSetHeader, FieldPacket[] ] =
                 await storage.query('INSERT INTO tickets (subject, status, created_at, updated_at, creator, source) VALUES (?, 1, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?, 2)', [ subject ? subject : 'Ticket without a title', email ])
             await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 1, ?, 2, UNIX_TIMESTAMP())', [ messageId, ticket.insertId, text, email ])
+            sendMail(email!, `Confirmation of sending ticket #${ticket.insertId}`, 'ticket-confirm', { ticket_id: ticket.insertId.toString() })
         } else {
             const [ reply ]: [ RowDataPacket[], FieldPacket[] ] =
                 await storage.query('SELECT ticket_id FROM messages WHERE message_id = ? LIMIT 1', [ inReplyTo ])

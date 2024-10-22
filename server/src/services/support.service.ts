@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { FieldPacket, ResultSetHeader, RowDataPacket } from '../storage'
 import { randomStringUtil } from '../utils/randomString.util'
+import sendMail from '../utils/mail.util'
 
 export class supportService {
     public async tickets (req: Request): Promise<{ code: number; data: string | object }> {
@@ -47,8 +48,8 @@ export class supportService {
         try {
             const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
             const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] = isAdmin
-                ? await req.storage.query(`SELECT ticket_id, status, assigned_id FROM tickets WHERE ticket_id = ? LIMIT 1`, [ ticketId ])
-                : await req.storage.query(`SELECT ticket_id, status, assigned_id FROM tickets WHERE ticket_id = ? AND (source = 1 AND creator = ?) OR (source = 2 AND creator = ?) LIMIT 1`, [ ticketId, req.user?.id, req.user?.email, req.user?.email ])
+                ? await req.storage.query(`SELECT ticket_id, subject, status, source, creator, assigned_id FROM tickets WHERE ticket_id = ? LIMIT 1`, [ ticketId ])
+                : await req.storage.query(`SELECT ticket_id, subject, status, source, creator, assigned_id FROM tickets WHERE ticket_id = ? AND (source = 1 AND creator = ?) OR (source = 2 AND creator = ?) LIMIT 1`, [ ticketId, req.user?.id, req.user?.email, req.user?.email ])
 
             if (ticket.length === 0)
                 return { code: 404, data: 'Ticket not found or you do not have access' }
@@ -65,6 +66,18 @@ export class supportService {
             await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, ?, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, role, req.user?.id ])
             await req.storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP() WHERE ticket_id = ? LIMIT 1', [ ticketId ])
 
+            if (isAdmin && role === 2 && ticket[0].source === 2) {
+                /*const [ messages ]: [ RowDataPacket[], FieldPacket[] ] =
+                    await req.storage.query('SELECT m.message_id, m.message, m.sender, (SELECT u.username FROM users u WHERE u.id = m.sender AND m.source = 1 LIMIT 1) as sender_name, created_at FROM messages m WHERE m.ticket_id = ? AND m.role != 3', [ ticketId ])
+
+                const messageIdsArray: string[] = messages.map((message: RowDataPacket): string => message.message_id)
+                sendMail(ticket[0].creator, `Re: ${ticket[0].subject}`, generateTicketNotify(
+                    'Ticket Closed Confirmation',
+                    `Your ticket with number ${ticket[0].ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
+                    'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
+                ), messageIdsArray[messageIdsArray.length - 1], messageIdsArray)*/
+            }
+
             return { code: 200, data: { messageId } }
         } catch (error) {
             throw error
@@ -74,8 +87,8 @@ export class supportService {
         try {
             const isAdmin: boolean = req.user?.role === 'admin' && (req.query.admin !== undefined)
             const [ ticket ]: [ RowDataPacket[], FieldPacket[] ] = isAdmin
-                ? await req.storage.query(`SELECT ticket_id, status, creator, assigned_id FROM tickets WHERE ticket_id = ? LIMIT 1`, [ ticketId ])
-                : await req.storage.query(`SELECT ticket_id, status, creator, assigned_id FROM tickets WHERE ticket_id = ? AND (source = 1 AND creator = ?) OR (source = 2 AND creator = ?) LIMIT 1`, [ ticketId, req.user?.id, req.user?.email, req.user?.email ])
+                ? await req.storage.query(`SELECT ticket_id, status, creator, source, assigned_id FROM tickets WHERE ticket_id = ? LIMIT 1`, [ ticketId ])
+                : await req.storage.query(`SELECT ticket_id, status, creator, source, assigned_id FROM tickets WHERE ticket_id = ? AND (source = 1 AND creator = ?) OR (source = 2 AND creator = ?) LIMIT 1`, [ ticketId, req.user?.id, req.user?.email, req.user?.email ])
 
             if (ticket.length === 0)
                 return { code: 404, data: 'Ticket not found or you do not have access' }
@@ -93,6 +106,14 @@ export class supportService {
 
             await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 3, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, req.user?.id ])
             await req.storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP(), status = 3 WHERE ticket_id = ? LIMIT 1', [ ticketId ])
+
+            if (isAdmin && role === 2 && ticket[0].source === 2) {
+                /*sendMail(ticket[0].creator, `Ticket #${ticket[0].ticket_id} has been closed`, generateTicketNotify(
+                    'Ticket Closed Confirmation',
+                    `Your ticket with number ${ticket[0].ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
+                    'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
+                ))*/
+            }
 
             return { code: 200, data: { ticketId: ticket[0].ticket_id } }
         } catch (error) {

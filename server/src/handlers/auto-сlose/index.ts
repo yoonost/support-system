@@ -1,14 +1,24 @@
 import { FieldPacket, PoolConnection, RowDataPacket, storageCallback } from '../../storage'
 import { randomStringUtil } from '../../utils/randomString.util'
+import sendMail from '../../utils/mail.util'
 
 async function autoCloseHandler (storage: PoolConnection): Promise<void> {
     const [ tickets ]: [ RowDataPacket[], FieldPacket[] ] =
-        await storage.query('SELECT ticket_id FROM tickets WHERE updated_at <= UNIX_TIMESTAMP() - 604800 AND status != 3 LIMIT 500')
+        await storage.query('SELECT ticket_id, source, creator FROM tickets WHERE updated_at <= UNIX_TIMESTAMP() - 604800 AND status != 3 LIMIT 500')
     for (const ticket of tickets) {
         const messageId: string = randomStringUtil(32)
         const message: string = 'The ticket has been automatically closed due to inactivity over the past 7 days. If you need further assistance, please create a new ticket or contact our support team'
         await storage.query('INSERT INTO messages (message_id, ticket_id, message, role, created_at) VALUES (?, ?, ?, 3, UNIX_TIMESTAMP())', [ messageId, ticket.ticket_id, message ])
         await storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP(), status = 3 WHERE ticket_id = ? LIMIT 1', [ ticket.ticket_id ])
+
+        if (ticket.source === 2) {
+            /*sendMail(ticket.creator, `Ticket #${ticket.ticket_id} has been closed`, generateTicketNotify(
+                'Ticket Closed Confirmation',
+                `Your ticket with number ${ticket.ticket_id} has been successfully closed. We believe that the issue has been resolved.`,
+                'If you believe the issue has not been fully resolved or you have additional questions, please create a new ticket by sending a new email or by accessing our support system.'
+            ))*/
+        }
+
         console.log(`[INFO] The handler automatically closed ticket #${ticket.ticket_id}`)
     }
 }

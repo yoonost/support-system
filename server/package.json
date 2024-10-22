@@ -16,7 +16,9 @@
         "@types/imap": "^0.8.40",
         "@types/mailparser": "^3.4.5",
         "@types/md5": "^2.3.5",
+        "@types/mjml": "^4.7.4",
         "@types/node": "^18.11.10",
+        "@types/nodemailer": "^6.4.16",
         "nodemon": "^3.1.2",
         "rimraf": "^3.0.2",
         "ts-node": "^10.9.1",
@@ -31,9 +33,12 @@
         "email-reply-parser": "^1.8.1",
         "express": "^4.19.2",
         "express-useragent": "^1.0.15",
+        "handlebars": "^4.7.8",
         "imap": "^0.8.19",
         "mailparser": "^3.7.1",
         "md5": "^2.3.0",
-        "mysql2": "^3.10.0"
+        "mjml": "^4.15.3",
+        "mysql2": "^3.10.0",
+        "nodemailer": "^6.9.15"
     }
 }

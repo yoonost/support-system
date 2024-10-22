@@ -1,0 +1,31 @@
+<mjml>
+  <mj-body>
+    <mj-section background-color="#000000" padding="20px" border-radius="20px">
+      <mj-column>
+        <mj-image width="50px" src="https://i.imgur.com/0d14s87.png" padding="20px" align="left"></mj-image>
+        <mj-text font-size="32px" color="#EBECF0" font-family="helvetica" align="left">Ticket Submission Confirmation</mj-text>
+        <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">
+          We have successfully received your request, and it has been logged under ticket number {params.ticketId}. Our team is already working on it, and we will get back to you as soon as possible with updates.
+        </mj-text>
+        <mj-text font-size="16px" color="#A4A8B2" font-family="helvetica" align="left">
+          If you have any additional information to provide, feel free to reply to this email or update the ticket manually through our support system.
+        </mj-text>
+
+        <!-- Новый блок -->
+        <mj-section background-color="#282933" padding="15px" border-radius="10px">
+          <!-- Две колонки для выравнивания текста в одну строчку -->
+          <mj-column width="70%">
+            <mj-text font-size="16px" color="#FFFFFF" font-family="helvetica" align="left">yoonost</mj-text>
+          </mj-column>
+          <mj-column width="30%">
+            <mj-text font-size="14px" color="#A4A8B2" font-family="helvetica" align="right">дата</mj-text>
+          </mj-column>
+          <mj-column width="100%">
+            <mj-text font-size="16px" color="#FFFFFF" font-family="helvetica" align="left">сообщение</mj-text>
+          </mj-column>
+        </mj-section>
+
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
