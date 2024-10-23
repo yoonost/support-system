@@ -13,12 +13,11 @@ export const storage: Pool = createPool({
 })
 
 export const storageCallback = async <T>(callback: (storage: PoolConnection) => Promise<T>): Promise<T> => {
-    let Storage: PoolConnection | undefined;
+    let Storage: PoolConnection | undefined
     try {
         Storage = await storage.getConnection()
         return await callback(Storage)
     } catch (error) {
-        console.error(error)
         throw error
     } finally {
         if (Storage) Storage.release()
