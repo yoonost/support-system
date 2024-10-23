@@ -1,6 +1,8 @@
 import TelegramBot, { Message, CallbackQuery } from 'node-telegram-bot-api'
-import { createTicket } from './service'
+import { createTicket, getTickets } from './service'
 import { isLength } from 'validator'
+import {RowDataPacket} from '../../storage'
+import moment from "moment/moment";
 
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN || '', { polling: true })
 
@@ -27,18 +29,39 @@ bot.onText(/\/start/, async (message: Message): Promise<any> => {
 bot.on('callback_query', async (query: CallbackQuery): Promise<any> => {
     if (!query.message || !query.data) return
 
-    await bot.editMessageReplyMarkup(
-        { inline_keyboard: [] },
-        { chat_id: query.message.chat.id, message_id: query.message.message_id }
-    )
+    try {
+        await bot.editMessageReplyMarkup(
+            { inline_keyboard: [] },
+            { chat_id: query.message.chat.id, message_id: query.message.message_id }
+        )
+    } catch (err) {}
 
     if (query.data === 'create-a-ticket') {
         await bot.sendMessage(query.message.chat.id, `✏️ Please write the subject for your ticket below!`, { reply_markup: { inline_keyboard: [[
             { text: '👣 Going back', callback_data: 'welcome-message' }
         ]]}})
-        return userState[query.message.chat.id] = { ...userState[query.message.chat.id],
-            callback: 'waiting-for-subject'
-        }
+        return userState[query.message.chat.id] = { ...userState[query.message.chat.id], callback: 'waiting-for-subject' }
+    }
+
+    if (query.data === 'my-tickets') {
+        let message = '🎫 Your tickets\n\n'
+        const tickets: RowDataPacket[] = await getTickets (query.message.chat.id)
+
+        tickets.map((ticket: RowDataPacket): void => {
+            message += `📌 #${ticket.ticket_id} ${ticket.subject}\n`
+            message += `🗓️ Created: ${moment(ticket.created_at).format("MMM Do YY")} | Last update: ${moment(ticket.updated_at).format("MMM Do YY")}\n`
+            message += `👤 Assigned to: ${ticket.assigned_id ? (ticket.assigned_name ? ticket.assigned_name : `Support agent ${ticket.assigned_id}`) : 'Not assigned'}\n`
+            message += (ticket.status === 1 ? '🟢 Status: Open' : (ticket.status === 2 ? '🔵 Status: In progress' : '🔴 Status: Closed')) + '\n'
+            if (ticket.last_message !== null) message += `📝 ${ticket.last_message}\n`
+            message += `🔗 /ticket${ticket.ticket_id}\n\n`
+        })
+
+        return await bot.sendMessage(query.message.chat.id,
+            message,
+            { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[
+                { text: '👣 Going back', callback_data: 'welcome-message' }
+            ]]}
+        })
     }
 
     return welcomeMessage(query.message)
