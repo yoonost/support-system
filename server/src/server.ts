@@ -13,3 +13,4 @@ new application([
 
 import './handlers/auto-сlose'
 import './handlers/mail'
+import './handlers/telegram'

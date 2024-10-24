@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { FieldPacket, ResultSetHeader, RowDataPacket } from '../storage'
 import { randomStringUtil } from '../utils/randomString.util'
+import { sendMessage } from '../handlers/telegram'
 import sendMail from '../utils/mail.util'
 import moment from 'moment'
 
@@ -88,6 +89,8 @@ export class supportService {
                     }).reverse()
                 }, messageIdsArray[messageIdsArray.length - 1], messageIdsArray)
             }
+            if (isAdmin && role === 2 && ticket[0].source === 3)
+                sendMessage(ticket[0].creator, ticket[0].ticket_id, `Ticket #${ticket[0].ticket_id} received a response\n\n${message}`)
 
             return { code: 200, data: { messageId } }
         } catch (error) {
@@ -118,9 +121,10 @@ export class supportService {
             await req.storage.query('INSERT INTO messages (message_id, ticket_id, message, role, sender, source, created_at) VALUES (?, ?, ?, 3, ?, 1, UNIX_TIMESTAMP())', [ messageId, ticketId, message, req.user?.id ])
             await req.storage.query('UPDATE tickets SET updated_at = UNIX_TIMESTAMP(), status = 3 WHERE ticket_id = ? LIMIT 1', [ ticketId ])
 
-            if (isAdmin && role === 2 && ticket[0].source === 2) {
+            if (isAdmin && role === 2 && ticket[0].source === 2)
                 sendMail(ticket[0].creator, `Ticket #${ticket[0].ticket_id} has been closed`, 'ticket-closed', { ticket_id: ticket[0].ticket_id })
-            }
+            if (isAdmin && role === 2 && ticket[0].source === 3)
+                sendMessage(ticket[0].creator, ticket[0].ticket_id, `Ticket #${ticket[0].ticket_id} has been closed`)
 
             return { code: 200, data: { ticketId: ticket[0].ticket_id } }
         } catch (error) {

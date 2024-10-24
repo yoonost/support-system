@@ -111,7 +111,7 @@ export default function Page(): ReactNode {
                     </div>
                     <div className='flex justify-between'>
                         <span className='text-palette-gray-2'>Assigned</span>
-                        <span className='text-palette-gray-1'>{ticket.assigned_id ? (ticket.assigned_name ? ticket.assigned_name : `Support agent ${ticket.assigned_id}`) : 'Awaiting'}</span>
+                        <span className='text-palette-gray-1'>{ticket.assigned_id ? (ticket.assigned_name ? ticket.assigned_name : `Support agent ${ticket.assigned_id}`) : 'Not assigned'}</span>
                     </div>
                 </div>
                 {ticket.status !== 3 && (
