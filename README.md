@@ -6,7 +6,7 @@
 This is a comprehensive customer support system that allows users to submit tickets through multiple channels: website, email, and Telegram. All tickets are synchronized within the system, ensuring smooth management and enabling support agents to respond more quickly to customer requests.
 
 ## Project Status
-This project is currently under development. The features mentioned below are planned but not fully functional yet. Contributions and feedback are welcome as the system is being actively built.
+All systems are stable but it is not recommended to use the project for production, because of lack of time all servers are divided instead of one service.
 
 ## Features
 - **Multi-channel ticket submission**: Users can submit support tickets via:
